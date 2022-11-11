@@ -3,6 +3,7 @@
 	import * as FP from 'fp-ts/lib/function';
 
 	import { asgardsAD$, reloadAsgards } from './stores/vaults';
+	import { poolsAD$, reloadPools } from './stores/pools';
 	import * as AD from './utils/async';
 </script>
 
@@ -24,7 +25,18 @@
 				AD.foldA(
 					() => '...',
 					(error) => error.toString(),
-					(result) => `ASGARDS no ${result.length}`
+					(list) => `${list.length} ASGARD's loaded`
+				)
+			)}
+		</div>
+		<button on:click={reloadPools}>Reload pools</button>
+		<div>
+			{FP.pipe(
+				$poolsAD$,
+				AD.foldA(
+					() => '...',
+					(error) => error.toString(),
+					(list) => `${list.length} POOLs loaded`
 				)
 			)}
 		</div>
