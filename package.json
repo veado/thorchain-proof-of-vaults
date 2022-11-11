@@ -1,0 +1,41 @@
+{
+	"name": "thorchain-proof-of-vaults",
+	"version": "0.0.1",
+	"type": "module",
+	"scripts": {
+		"dev": "vite",
+		"build": "vite build",
+		"preview": "vite preview",
+		"test": "vitest",
+		"check": "svelte-check --tsconfig ./tsconfig.json",
+		"lint": "prettier --check --plugin-search-dir=. . && eslint .",
+		"format": "prettier --write --plugin-search-dir=. .",
+		"deploy": "npm run build && npx gh-pages -d dist"
+	},
+	"devDependencies": {
+		"@sveltejs/vite-plugin-svelte": "^1.1.0",
+		"@tsconfig/svelte": "^3.0.0",
+		"@typescript-eslint/eslint-plugin": "^5.42.1",
+		"@typescript-eslint/parser": "^5.42.1",
+		"autoprefixer": "^10.4.13",
+		"eslint": "^8.27.0",
+		"eslint-config-prettier": "^8.5.0",
+		"eslint-plugin-svelte3": "^4.0.0",
+		"gh-pages": "^4.0.0",
+		"postcss": "^8.4.19",
+		"prettier": "^2.7.1",
+		"prettier-plugin-svelte": "^2.8.0",
+		"svelte": "^3.53.1",
+		"svelte-check": "^2.9.2",
+		"svelte-preprocess": "^4.10.7",
+		"tailwindcss": "^3.2.3",
+		"tslib": "^2.4.1",
+		"typescript": "^4.8.4",
+		"vite": "^3.2.3",
+		"vitest": "^0.25.1"
+	},
+	"dependencies": {
+		"fp-ts": "^2.13.1",
+		"rxjs": "^7.5.7"
+	}
+}
