@@ -2,9 +2,12 @@
 	import logo from './assets/logo.png';
 	import * as FP from 'fp-ts/lib/function';
 
-	import { asgardsAD$, reloadAsgards } from './stores/vaults';
-	import { poolsAD$, reloadPools } from './stores/pools';
-	import * as AD from './utils/async';
+	import { data, loadAllData } from './stores/store';
+	import * as RD from '@devexperts/remote-data-ts';
+	import { onMount } from 'svelte';
+
+	// load all data on start
+	onMount(loadAllData);
 </script>
 
 <main class="flex flex-col bg-gray-100 h-screen p-10 md:p-20">
@@ -17,26 +20,16 @@
 			/>
 		</div>
 		<h1 class="text-2xl text-center uppercase">Proof Of Vaults</h1>
-		<p class="text-lg text-center uppercase text-gray-300">coming soon</p>
-		<button on:click={reloadAsgards}>Reload asgards</button>
+		<button class=" text-gray-300" on:click={loadAllData}>Reload data</button>
 		<div>
 			{FP.pipe(
-				$asgardsAD$,
-				AD.foldA(
+				$data,
+				RD.fold(
+					() => '...',
 					() => '...',
 					(error) => error.toString(),
-					(list) => `${list.length} ASGARD's loaded`
-				)
-			)}
-		</div>
-		<button on:click={reloadPools}>Reload pools</button>
-		<div>
-			{FP.pipe(
-				$poolsAD$,
-				AD.foldA(
-					() => '...',
-					(error) => error.toString(),
-					(list) => `${list.length} POOLs loaded`
+					({ vaults, pools, nodes }) =>
+						`${vaults.length} ASGARD's / ${pools.length} pools / ${nodes.length} active nodes`
 				)
 			)}
 		</div>
