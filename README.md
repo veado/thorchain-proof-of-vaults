@@ -29,7 +29,6 @@ npm run dev
 ## Built with (in alphabetical order)
 
 - [fp-ts](https://gcanti.github.io/fp-ts/)
-- [RxJS](https://rxjs.dev)
 - [Svelte](https://svelte.dev)
 - [tailwindcss](https://tailwindcss.com)
 - [TypeScript](https://www.typescriptlang.org/)
