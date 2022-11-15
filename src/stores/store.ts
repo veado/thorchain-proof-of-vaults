@@ -1,24 +1,25 @@
 import {
 	Configuration as ThornodeConfig,
 	NodesApi,
-	NodeStatusEnum,
 	VaultsApi,
 	type Node
 } from '@xchainjs/xchain-thornode';
 import type { Vault } from '@xchainjs/xchain-thornode';
 import * as FP from 'fp-ts/lib/function';
 import { THORNODE_URL } from './const';
-import { writable, type Writable } from 'svelte/store';
+import { derived, writable, type Readable, type Writable } from 'svelte/store';
 import * as E from 'fp-ts/lib/Either';
-import * as A from 'fp-ts/lib/Array';
 import * as RD from '@devexperts/remote-data-ts';
 
 import * as TE from 'fp-ts/lib/TaskEither';
 import { MIDGARD_URL } from './const';
 
-import type { PoolDetails } from '@xchainjs/xchain-midgard';
+import type { PoolDetails, StatsData } from '@xchainjs/xchain-midgard';
 import { Configuration as MidgardConfig, DefaultApi } from '@xchainjs/xchain-midgard';
 import { sequenceSTaskEither } from '../utils/fp';
+import type { DataAD, PoolsDataMap, VaultData, VaultDataMap } from '../types/types';
+import { getPoolsData, toNodesVaultDataMap, toNodesMap, toVaultDataMap } from '../utils/data';
+import { assetAmount } from '@xchainjs/xchain-util';
 
 const midgardConfig = new MidgardConfig({ basePath: MIDGARD_URL });
 const midgardApi = new DefaultApi(midgardConfig);
@@ -28,14 +29,35 @@ const vaultsApi = new VaultsApi(thornodeConfig);
 const nodesApi = new NodesApi(thornodeConfig);
 
 // All data (incl. loading/error status)
-export type DataAD = RD.RemoteData<Error, { vaults: Vault[]; pools: PoolDetails; nodes: Node[] }>;
-export type DataStore = Writable<DataAD>;
-export const data: DataStore = writable(RD.pending);
+export const dataRD: Writable<DataAD> = writable(RD.pending);
+export const vaults: Readable<Array<{ id: string; vaults: VaultData[] }>> = derived(
+	dataRD,
+	(dataRD) =>
+		FP.pipe(
+			dataRD,
+			RD.map(({ vaults }) => Array.from(vaults, ([id, vaults]) => ({ id, vaults }))),
+			RD.getOrElse(() => [])
+		)
+);
+
+export const pools: Readable<PoolsDataMap> = derived(dataRD, (dataRD) =>
+	FP.pipe(
+		dataRD,
+		RD.map(({ pools }) => pools),
+		RD.getOrElse(() => new Map())
+	)
+);
 
 const loadAsgards = (): TE.TaskEither<Error, Vault[]> =>
 	FP.pipe(
 		TE.tryCatch(() => vaultsApi.asgard(), E.toError),
 		TE.map(({ data }) => data)
+	);
+
+const loadAsgardsJSON = (): TE.TaskEither<Error, Vault[]> =>
+	FP.pipe(
+		TE.tryCatch(() => import('../../test/responses/churn-8231550/asgard.json'), E.toError),
+		TE.map((result) => result.default as Vault[])
 	);
 
 const loadPools = (): TE.TaskEither<Error, PoolDetails> =>
@@ -44,32 +66,79 @@ const loadPools = (): TE.TaskEither<Error, PoolDetails> =>
 		TE.map(({ data }) => data)
 	);
 
+const loadPoolsJSON = (): TE.TaskEither<Error, PoolDetails> =>
+	FP.pipe(
+		TE.tryCatch(() => import('../../test/responses/churn-8231550/pools.json'), E.toError),
+		TE.map((result) => result.default)
+	);
+
+const loadStats = (): TE.TaskEither<Error, StatsData> =>
+	FP.pipe(
+		TE.tryCatch(() => midgardApi.getStats(), E.toError),
+		TE.map(({ data }) => data)
+	);
+
+const loadStatsJSON = (): TE.TaskEither<Error, StatsData> =>
+	FP.pipe(
+		TE.tryCatch(() => import('../../test/responses/churn-8231550/stats.json'), E.toError),
+		TE.map((result) => result.default)
+	);
+
 const loadNodes = (): TE.TaskEither<Error, Node[]> =>
 	FP.pipe(
 		TE.tryCatch(() => nodesApi.nodes(), E.toError),
 		TE.map(({ data }) => data)
 	);
 
+const loadNodesJSON = (): TE.TaskEither<Error, Node[]> =>
+	FP.pipe(
+		TE.tryCatch(() => import('../../test/responses/churn-8231550/nodes.json'), E.toError),
+		TE.map((result) => result.default as Node[])
+	);
+
+const _1 = [loadAsgards, loadPools, loadNodes, loadStats];
+const _2 = [loadAsgardsJSON, loadPoolsJSON, loadNodesJSON, loadStatsJSON];
+
 export const loadAllData = async () =>
 	FP.pipe(
 		// pending
-		data.set(RD.pending),
-		// load all data in sequence (similar to Promise.all)
-		() => sequenceSTaskEither({ asgards: loadAsgards(), pools: loadPools(), nodes: loadNodes() }),
+		dataRD.set(RD.pending),
+		// () =>
+		// 	sequenceSTaskEither({
+		// 		asgards: loadAsgards(),
+		// 		pools: loadPools(),
+		// 		nodes: loadNodes(),
+		// 		stats: loadStats()
+		// 	}),
+		() =>
+			sequenceSTaskEither({
+				asgards: loadAsgardsJSON(),
+				pools: loadPoolsJSON(),
+				nodes: loadNodesJSON(),
+				stats: loadStatsJSON()
+			}),
 		(seq) =>
 			seq().then(
 				E.fold(
-					// check errors
 					(e) => {
-						data.set(RD.failure(e));
+						dataRD.set(RD.failure(e));
 					},
-					// handle data
-					({ asgards, pools, nodes }) => {
-						const activeNodes = FP.pipe(
-							nodes,
-							A.filter((node) => node.status === NodeStatusEnum.Active)
-						);
-						data.set(RD.success({ vaults: asgards, pools, nodes: activeNodes }));
+					({ asgards, pools, nodes, stats }) => {
+						const poolsDataMap = getPoolsData(pools);
+						const asgardVaults = toVaultDataMap({
+							vaults: asgards,
+							poolsData: poolsDataMap,
+							type: 'asgard'
+						});
+						const nodesMap = toNodesMap(nodes);
+						const asgardBondVaults = toNodesVaultDataMap({
+							vaults: asgards,
+							runeUSDPrice: assetAmount(stats.runePriceUSD),
+							nodes: nodesMap
+						});
+						const asgardVaultMap: VaultDataMap = new Map([...asgardVaults, ...asgardBondVaults]);
+
+						dataRD.set(RD.success({ vaults: asgardVaultMap, pools: poolsDataMap, nodes }));
 					}
 				)
 			)
