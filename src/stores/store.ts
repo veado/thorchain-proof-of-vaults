@@ -14,11 +14,12 @@ import * as RD from '@devexperts/remote-data-ts';
 import * as TE from 'fp-ts/lib/TaskEither';
 import { MIDGARD_URL } from './const';
 
-import type { PoolDetails } from '@xchainjs/xchain-midgard';
+import type { PoolDetails, StatsData } from '@xchainjs/xchain-midgard';
 import { Configuration as MidgardConfig, DefaultApi } from '@xchainjs/xchain-midgard';
 import { sequenceSTaskEither } from '../utils/fp';
-import type { DataAD, VaultData, VaultDataMap } from '../types/types';
-import { getNodeBonds, getPoolsData, toBondsMap, toVaultDataMap } from '../utils/data';
+import type { DataAD, PoolsDataMap, VaultData, VaultDataMap } from '../types/types';
+import { getPoolsData, toNodesVaultDataMap, toNodesMap, toVaultDataMap } from '../utils/data';
+import { assetAmount } from '@xchainjs/xchain-util';
 
 const midgardConfig = new MidgardConfig({ basePath: MIDGARD_URL });
 const midgardApi = new DefaultApi(midgardConfig);
@@ -35,9 +36,16 @@ export const vaults: Readable<Array<{ id: string; vaults: VaultData[] }>> = deri
 		FP.pipe(
 			dataRD,
 			RD.map(({ vaults }) => Array.from(vaults, ([id, vaults]) => ({ id, vaults }))),
-			RD.map((v) => v),
 			RD.getOrElse(() => [])
 		)
+);
+
+export const pools: Readable<PoolsDataMap> = derived(dataRD, (dataRD) =>
+	FP.pipe(
+		dataRD,
+		RD.map(({ pools }) => pools),
+		RD.getOrElse(() => new Map())
+	)
 );
 
 const loadAsgards = (): TE.TaskEither<Error, Vault[]> =>
@@ -46,10 +54,34 @@ const loadAsgards = (): TE.TaskEither<Error, Vault[]> =>
 		TE.map(({ data }) => data)
 	);
 
+const loadAsgardsJSON = (): TE.TaskEither<Error, Vault[]> =>
+	FP.pipe(
+		TE.tryCatch(() => import('../../test/responses/churn-8231550/asgard.json'), E.toError),
+		TE.map((result) => result.default as Vault[])
+	);
+
 const loadPools = (): TE.TaskEither<Error, PoolDetails> =>
 	FP.pipe(
 		TE.tryCatch(() => midgardApi.getPools(), E.toError),
 		TE.map(({ data }) => data)
+	);
+
+const loadPoolsJSON = (): TE.TaskEither<Error, PoolDetails> =>
+	FP.pipe(
+		TE.tryCatch(() => import('../../test/responses/churn-8231550/pools.json'), E.toError),
+		TE.map((result) => result.default)
+	);
+
+const loadStats = (): TE.TaskEither<Error, StatsData> =>
+	FP.pipe(
+		TE.tryCatch(() => midgardApi.getStats(), E.toError),
+		TE.map(({ data }) => data)
+	);
+
+const loadStatsJSON = (): TE.TaskEither<Error, StatsData> =>
+	FP.pipe(
+		TE.tryCatch(() => import('../../test/responses/churn-8231550/stats.json'), E.toError),
+		TE.map((result) => result.default)
 	);
 
 const loadNodes = (): TE.TaskEither<Error, Node[]> =>
@@ -58,26 +90,55 @@ const loadNodes = (): TE.TaskEither<Error, Node[]> =>
 		TE.map(({ data }) => data)
 	);
 
+const loadNodesJSON = (): TE.TaskEither<Error, Node[]> =>
+	FP.pipe(
+		TE.tryCatch(() => import('../../test/responses/churn-8231550/nodes.json'), E.toError),
+		TE.map((result) => result.default as Node[])
+	);
+
+const _1 = [loadAsgards, loadPools, loadNodes, loadStats];
+const _2 = [loadAsgardsJSON, loadPoolsJSON, loadNodesJSON, loadStatsJSON];
+
 export const loadAllData = async () =>
 	FP.pipe(
 		// pending
 		dataRD.set(RD.pending),
-		// load all data in sequence (similar to Promise.all)
-		() => sequenceSTaskEither({ asgards: loadAsgards(), pools: loadPools(), nodes: loadNodes() }),
+		// () =>
+		// 	sequenceSTaskEither({
+		// 		asgards: loadAsgards(),
+		// 		pools: loadPools(),
+		// 		nodes: loadNodes(),
+		// 		stats: loadStats()
+		// 	}),
+		() =>
+			sequenceSTaskEither({
+				asgards: loadAsgardsJSON(),
+				pools: loadPoolsJSON(),
+				nodes: loadNodesJSON(),
+				stats: loadStatsJSON()
+			}),
 		(seq) =>
 			seq().then(
 				E.fold(
 					(e) => {
 						dataRD.set(RD.failure(e));
 					},
-					({ asgards, pools, nodes }) => {
-						const poolsData = getPoolsData(pools);
-						const asgardVaults = toVaultDataMap({ vaults: asgards, poolsData, type: 'asgard' });
-						const bonds = getNodeBonds(nodes);
-						const asgardBondVaults = toBondsMap({ vaults: asgards, poolsData, bonds });
+					({ asgards, pools, nodes, stats }) => {
+						const poolsDataMap = getPoolsData(pools);
+						const asgardVaults = toVaultDataMap({
+							vaults: asgards,
+							poolsData: poolsDataMap,
+							type: 'asgard'
+						});
+						const nodesMap = toNodesMap(nodes);
+						const asgardBondVaults = toNodesVaultDataMap({
+							vaults: asgards,
+							runeUSDPrice: assetAmount(stats.runePriceUSD),
+							nodes: nodesMap
+						});
 						const asgardVaultMap: VaultDataMap = new Map([...asgardVaults, ...asgardBondVaults]);
 
-						dataRD.set(RD.success({ vaults: asgardVaultMap, pools, nodes }));
+						dataRD.set(RD.success({ vaults: asgardVaultMap, pools: poolsDataMap, nodes }));
 					}
 				)
 			)

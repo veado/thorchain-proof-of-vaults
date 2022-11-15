@@ -5,31 +5,42 @@ import {
 	type BaseAmount,
 	type Address,
 	assetFromString,
-	assetToString
+	assetToString,
+	bnOrZero,
+	baseToAsset,
+	type AssetAmount,
+	assetAmount
 } from '@xchainjs/xchain-util';
-import BigNumber from 'bignumber.js';
 import * as FP from 'fp-ts/lib/function';
 import * as A from 'fp-ts/lib/Array';
 import * as O from 'fp-ts/lib/Option';
 import * as M from 'fp-ts/lib/Monoid';
 import type {
 	BondsDataMap,
-	NodeBondsMap,
+	NodesData,
+	NodesMap,
 	PoolsDataMap,
+	PoolStatus,
 	VaultData,
 	VaultDataMap,
+	VaultStatus,
 	VaultType
 } from 'src/types/types';
 import { THORNODE_DECIMAL } from '../stores/const';
 import type { PoolDetail, PoolDetails } from '@xchainjs/xchain-midgard';
-import { monoidBaseAmount } from './fp';
+import { monoidAssetAmount, monoidBaseAmount, sequenceSOption } from './fp';
 
-export const getNodeBonds = (nodes: Node[]): NodeBondsMap =>
+export const toNodesMap = (nodes: Node[]): NodesMap =>
 	FP.pipe(
 		nodes,
 		A.reduce(new Map(), (acc, cur: Node) => {
 			const sec = cur.pub_key_set.secp256k1;
-			if (sec) return acc.set(sec, baseAmount(cur.bond, THORNODE_DECIMAL));
+			if (sec)
+				return acc.set(sec, {
+					bondAmount: baseAmount(cur.bond, THORNODE_DECIMAL),
+					nodeStatus: cur.status,
+					bondAddress: cur.bond_address
+				});
 			else return acc;
 		})
 	);
@@ -43,26 +54,40 @@ export const filterNodes = (nodes: Node[], status: NodeStatusEnum) =>
 export const getPoolsData = (pools: PoolDetails): PoolsDataMap =>
 	FP.pipe(
 		pools,
-		A.reduce(new Map(), (acc, cur: PoolDetail) =>
-			acc.set(cur.asset, { status: cur.status, price: new BigNumber(cur.assetPrice) })
+		A.reduce<PoolDetail, PoolsDataMap>(new Map(), (acc, cur: PoolDetail) =>
+			FP.pipe(
+				cur.asset,
+				assetFromString,
+				O.fromNullable,
+				O.fold(
+					() => acc,
+					(asset) =>
+						acc.set(cur.asset, {
+							asset,
+							status: (cur.status || 'unknown') as PoolStatus,
+							priceUSD: bnOrZero(cur.assetPrice),
+							runeDepth: bnOrZero(cur.runeDepth)
+						})
+				)
+			)
 		)
 	);
 
-export const getTotalBonds = (members: Address[], bonds: NodeBondsMap): BaseAmount =>
+export const getTotalBonds = (members: Address[], nodes: NodesMap): BaseAmount =>
 	FP.pipe(
 		members,
-		A.filterMap((member: string) => O.fromNullable(bonds.get(member))),
+		A.filterMap((member: string) => O.fromNullable(nodes.get(member).bondAmount)),
 		A.reduce(baseAmount(0, THORNODE_DECIMAL), (acc, cur: BaseAmount) => acc.plus(cur))
 	);
 
-const getAddress = (addresses: VaultAddress[], chain: string): O.Option<Address> =>
+export const getAddress = (addresses: VaultAddress[], chain: string): O.Option<Address> =>
 	FP.pipe(
 		addresses,
 		A.findFirst(({ chain: c, address }) => c === chain && !!address),
 		O.map(({ address }) => address)
 	);
 
-const getPrice = ({
+export const getPrice = ({
 	asset,
 	amount,
 	poolsData
@@ -70,11 +95,19 @@ const getPrice = ({
 	asset: Asset;
 	amount: BaseAmount;
 	poolsData: PoolsDataMap;
-}): O.Option<BaseAmount> =>
+}): O.Option<AssetAmount> =>
 	FP.pipe(
 		poolsData.get(assetToString(asset)),
 		O.fromNullable,
-		O.map(({ price }) => amount.times(baseAmount(price, THORNODE_DECIMAL)))
+		O.map(({ priceUSD: price }) => baseToAsset(amount).times(assetAmount(price, THORNODE_DECIMAL)))
+	);
+
+export const getPoolStatus = (asset: Asset, poolsData: PoolsDataMap): PoolStatus =>
+	FP.pipe(
+		poolsData.get(assetToString(asset)),
+		O.fromNullable,
+		O.map((data) => data?.status ?? 'unknown'),
+		O.getOrElse(() => 'unknown')
 	);
 
 const toVaultData = ({
@@ -85,25 +118,27 @@ const toVaultData = ({
 	vault: Vault;
 	poolsData: PoolsDataMap;
 	type: VaultType;
-}) =>
+}): VaultData[] =>
 	FP.pipe(
-		vault.coins,
-		A.filterMap((coin) =>
-			FP.pipe(
+		vault.coins || [], // Important note: coins can be null while churning!
+		A.filterMap((coin) => {
+			return FP.pipe(
 				assetFromString(coin.asset),
 				O.fromNullable,
 				O.map<Asset, VaultData>((asset: Asset) => {
 					const amount = baseAmount(coin.amount, coin?.decimals ?? THORNODE_DECIMAL);
+
 					return {
 						asset,
 						address: getAddress(vault.addresses, asset.chain),
 						amount: baseAmount(coin.amount, coin?.decimals ?? THORNODE_DECIMAL),
-						price: getPrice({ asset, amount, poolsData }),
-						type
+						amountUSD: getPrice({ asset, amount, poolsData }),
+						type,
+						status: (vault?.status ?? 'unknown') as VaultStatus
 					};
 				})
-			)
-		)
+			);
+		})
 	);
 
 /**
@@ -135,35 +170,42 @@ export const toVaultDataMap = ({
 /**
  * Takes vaults to get bonds of all members
  */
-export const toBondsMap = ({
+export const toNodesVaultDataMap = ({
 	vaults,
-	poolsData,
-	bonds
+	nodes,
+	runeUSDPrice
 }: {
 	vaults: Vault[];
-	poolsData: PoolsDataMap;
-	bonds: NodeBondsMap;
-}): BondsDataMap => {
-	return FP.pipe(
+	nodes: NodesMap;
+	runeUSDPrice: AssetAmount;
+}): BondsDataMap =>
+	FP.pipe(
 		vaults,
-		A.filterMap((vault: Vault) => {
-			const totalBonds = getTotalBonds(vault.membership, bonds);
-			const thorAddress = getAddress(vault.addresses, 'THOR');
-			return FP.pipe(
-				assetFromString('THOR.RUNE'),
-				O.fromNullable,
-				O.map<Asset, VaultData>((asset) => ({
-					asset,
-					address: thorAddress,
-					amount: totalBonds,
-					price: getPrice({ asset, amount: totalBonds, poolsData }),
-					type: 'bond'
-				}))
-			);
-		}),
+		A.map((vault: Vault) =>
+			FP.pipe(
+				vault.membership,
+				A.filterMap((member) => {
+					const oNodeData = O.fromNullable(nodes.get(member));
+					const oAsset = O.fromNullable(assetFromString('THOR.RUNE'));
+					return FP.pipe(
+						sequenceSOption({ node: oNodeData, asset: oAsset }),
+						O.map<{ node: NodesData; asset: Asset }, VaultData>(
+							({ node: { bondAddress, bondAmount, nodeStatus }, asset }) => ({
+								asset,
+								address: O.some(bondAddress),
+								amount: bondAmount,
+								type: 'bond',
+								status: nodeStatus,
+								amountUSD: O.some(baseToAsset(bondAmount).times(runeUSDPrice))
+							})
+						)
+					);
+				})
+			)
+		),
+		A.flatten,
 		(bondsData) => new Map([['THOR.RUNE', bondsData]])
 	);
-};
 
 export const sumAmounts = (amounts: Array<Pick<VaultData, 'amount'>>): BaseAmount =>
 	FP.pipe(
@@ -171,3 +213,15 @@ export const sumAmounts = (amounts: Array<Pick<VaultData, 'amount'>>): BaseAmoun
 		A.map(({ amount }) => amount),
 		M.concatAll(monoidBaseAmount)
 	);
+
+export const sumUSDAmounts = (amounts: Array<Pick<VaultData, 'amountUSD'>>): AssetAmount =>
+	FP.pipe(
+		amounts,
+		A.filterMap(({ amountUSD }) => amountUSD),
+		M.concatAll(monoidAssetAmount)
+	);
+
+export const trimAddress = (addr: Address) => {
+	const l = addr.length;
+	return l <= 8 ? addr : `${addr.substring(0, 4)}...${addr.substring(l - 4)}`;
+};
