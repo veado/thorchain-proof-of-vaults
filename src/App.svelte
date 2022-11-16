@@ -14,17 +14,18 @@
 	import { dataRD, loadAllData, vaults, pools } from './stores/store';
 	import * as RD from '@devexperts/remote-data-ts';
 	import { onMount } from 'svelte';
-	import { getPoolStatus, trimAddress } from './utils/data';
+	import { getNoVaults, getPoolStatus, trimAddress } from './utils/data';
 	import { sequenceSOption } from './utils/fp';
-	import ExternalLinkIcon from './components/ExternalLinkIcon.svelte';
-	import type { PoolStatus, VaultStatus } from './types/types';
+	import ExternalLinkIcon from './components/IconExternalLink.svelte';
+	import type { PoolStatus, VaultStatus, VaultType } from './types/types';
+	import AssetIcon from './components/AssetIcon.svelte';
 
 	const getColorByPoolStatus = (status: PoolStatus) => {
 		switch (status) {
 			case 'available':
-				return 'bg-green-500';
+				return 'bg-cyan-500';
 			case 'staged':
-				return 'bg-amber-300';
+				return 'bg-stone-300';
 			case 'suspended':
 				return 'bg-gray-300';
 			case 'unknown':
@@ -36,10 +37,23 @@
 		switch (status) {
 			case 'ActiveVault':
 			case 'Active':
-				return 'bg-green-500';
+				return 'bg-cyan-500';
 			case 'RetiringVault':
 			case 'Standby':
-				return 'bg-amber-300';
+				return 'bg-stone-300';
+			case 'unknown':
+				return 'bg-gray-300';
+		}
+	};
+
+	const getColorByVaultType = (type: VaultType) => {
+		switch (type) {
+			case 'asgard':
+				return 'bg-lime-500';
+			case 'ygg':
+				return 'bg-yellow-500';
+			case 'bond':
+				return 'bg-black-300';
 			case 'unknown':
 				return 'bg-gray-300';
 		}
@@ -75,72 +89,103 @@
 		{#each $vaults as vs}
 			{@const asset = vs.asset}
 			{@const poolStatus = getPoolStatus(asset, $pools)}
+			{@const noAsgards = getNoVaults('asgard', vs.data)}
+			{@const noYggs = getNoVaults('ygg', vs.data)}
 			<!-- vaults wrapper -->
-			<div class="flex flex-row p-10 rounded-xl border border-blue-300 mb-20">
+			<div class="flex flex-col p-10 rounded-xl border border-gray-300 mb-20">
 				<!-- vault overview -->
-				<div class="flex flex-col w-[400px] justify-start items-start">
-					<h1 class="text-4xl text-gray-800 leading-none pb-1">{asset.ticker}</h1>
-					<h2 class="text-2xl text-gray-400 py-0 leading-none">{asset.chain}</h2>
-					<div class="flex items-center my-2">
-						<div class="bg-blue-300 border rounded-lg text-gray-50 px-1 text-xs uppercase">
-							{$vaults.length} vaults
+				<div class="flex flex-col justify-center items-center">
+					<div class="flex items-center">
+						<AssetIcon
+							{asset}
+							class="w-[50px] h-[50px] lg:w-[60px] lg:h-[60px] xl:w-[70px] xl:h-[70px]"
+						/>
+						<div class="ml-1 lg:ml-3 xl:ml-5 pr-10 border-r border-gray-200">
+							<h1 class="text-xl lg:text-3xl xl:text-4xl text-gray-800 leading-none pb-1">
+								{asset.ticker}
+							</h1>
+							<h2 class="text-lg lg:text-1xl xl:text-2xl text-gray-400 py-0 leading-none">
+								{asset.chain}
+							</h2>
 						</div>
-
+						<div class="flex flex-col ml-10">
+							<h3 class="text-xl lg:text-3xl xl:text-4xl text-gray-600 py-0 leading-none">
+								{formatAssetAmountCurrency({
+									amount: baseToAsset(vs.total),
+									asset,
+									trimZeros: true,
+									decimal: 6
+								})}
+							</h3>
+							<h3 class="text-lg lg:text-1xl xl:text-2xl text-gray-300 py-0 leading-none pt-1">
+								{FP.pipe(
+									vs.totalUSD,
+									O.chain(O.fromPredicate((totalUSD) => totalUSD.gt(assetAmount(0)))),
+									O.fold(
+										() => 'Unknown USD price',
+										(totalUSD) =>
+											formatAssetAmountCurrency({
+												amount: totalUSD,
+												decimal: 2,
+												trimZeros: false
+											})
+									)
+								)}
+							</h3>
+						</div>
+					</div>
+					<div class="flex items-start mt-10">
+						<div
+							class={`${getColorByVaultType(
+								'asgard'
+							)} rounded-lg text-gray-50 px-3 text-xs xl:text-base uppercase`}
+						>
+							{noAsgards} Asgards
+						</div>
+						{#if noYggs > 0}
+							<div
+								class={`${getColorByVaultType(
+									'ygg'
+								)} rounded-lg text-gray-50 px-3 text-xs xl:text-base uppercase ml-2`}
+							>
+								{noYggs} Yggdrasils
+							</div>
+						{/if}
 						<div
 							class={`${getColorByPoolStatus(
 								poolStatus
-							)} border rounded-lg text-gray-50 text-xs ml-1 px-2 uppercase`}
+							)} rounded-lg text-gray-50 text-xs xl:text-base ml-2 px-3 uppercase`}
 						>
 							{getPoolStatus(asset, $pools)} pool
 						</div>
 					</div>
-					<h3 class="text-3xl text-gray-600 py-0 leading-none">
-						{formatAssetAmountCurrency({
-							amount: baseToAsset(vs.total),
-							asset,
-							trimZeros: true,
-							decimal: 6
-						})}
-					</h3>
-					<h3 class="text-xl text-gray-300 py-0 leading-none pt-1">
-						{FP.pipe(
-							vs.totalUSD,
-							O.chain(O.fromPredicate((totalUSD) => totalUSD.gt(assetAmount(0)))),
-							O.fold(
-								() => 'Unknown USD price',
-								(totalUSD) =>
-									formatAssetAmountCurrency({
-										amount: totalUSD,
-										decimal: 2,
-										trimZeros: false
-									})
-							)
-						)}
-					</h3>
 				</div>
-				<div class="flex items-center px-10 ">=></div>
 				<!-- vault details -->
-				<div>
+				<div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3 xl:gap-6 mt-20">
 					{#each vs.data as v}
 						{@const addr = O.getOrElse(() => '')(v.address)}
-						<div class="flex flex-col border-b last:border-b-0 border-gray-200 py-3 px-5">
+						<div class="flex flex-col items-center py-3 px-5 bg-gray-50 rounded-lg">
 							<div class="flex items-center">
-								<div class="bg-slate-300 border rounded-lg text-gray-50 px-1 text-xs">
+								<div
+									class={`${getColorByVaultType(
+										v.type
+									)} rounded-lg text-gray-50 px-3 text-xs uppercase`}
+								>
 									{v.type}
 								</div>
 								<div
 									class={`${getColorByVaultStatus(
 										v.status
-									)} border rounded-lg text-gray-50 px-1 text-xs ml-2`}
+									)} rounded-lg text-gray-50 px-3 text-xs ml-2 uppercase`}
 								>
 									{v.status}
 								</div>
-								{#if !!addr}
-									<div class="flex items-center text-sm text-blue-400 ml-2" title={addr}>
-										<span class="">{trimAddress(addr)}</span><ExternalLinkIcon class="ml-1" />
-									</div>
-								{/if}
 							</div>
+							{#if !!addr}
+								<div class="flex items-center text-base text-indigo-600 ml-2" title={addr}>
+									<span class="">{trimAddress(addr)} </span><ExternalLinkIcon class="ml-1" />
+								</div>
+							{/if}
 							<div class="text-lg text-gray-600 leading-none">
 								{formatAssetAmountCurrency({
 									amount: baseToAsset(v.amount),
@@ -149,7 +194,7 @@
 									trimZeros: true
 								})}
 							</div>
-							<div class="text-sm text-gray-300 leading-none">
+							<div class="text-base text-gray-300 leading-none">
 								{FP.pipe(
 									sequenceSOption({
 										asset: O.fromNullable(assetFromString('BNB.BUSD')),

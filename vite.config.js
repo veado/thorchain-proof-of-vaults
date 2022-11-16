@@ -17,5 +17,16 @@ process.env.VITE_VERSION = version;
 export default defineConfig({
 	// https://vitejs.dev/config/#base
 	base: '/thorchain-proof-of-vaults/',
-	plugins: [svelte()]
+	plugins: [svelte()],
+	define: {
+		// By default, Vite doesn't include shims for NodeJS/
+		// necessary for segment analytics lib to work
+		global: {}
+	},
+	resolve: {
+		alias: {
+			stream: 'stream-browserify',
+			buffer: 'buffer'
+		}
+	}
 });
