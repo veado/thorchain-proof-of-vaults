@@ -36,9 +36,11 @@
 	},
 	"dependencies": {
 		"@devexperts/remote-data-ts": "^2.1.1",
+		"@ethersproject/address": "^5.7.0",
 		"@xchainjs/xchain-midgard": "^0.2.0",
 		"@xchainjs/xchain-thornode": "^0.1.1",
 		"@xchainjs/xchain-util": "^0.11.0",
+		"buffer": "^6.0.3",
 		"fp-ts": "^2.13.1"
 	}
 }

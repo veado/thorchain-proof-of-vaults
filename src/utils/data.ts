@@ -1,3 +1,5 @@
+import { getAddress as ethGetAddr } from '@ethersproject/address';
+
 import type {
 	Node,
 	NodeStatusEnum,
@@ -252,3 +254,16 @@ export const trimAddress = (addr: Address) => {
 	const l = addr.length;
 	return l <= 8 ? addr : `${addr.substring(0, 4)}...${addr.substring(l - 4)}`;
 };
+
+export const getEthTokenAddress = (asset: Asset): Address =>
+	FP.pipe(
+		// strip 0X only - 0x is still valid
+		asset.symbol.slice(asset.ticker.length + 1).replace(/^0X/, ''),
+		ethGetAddr
+	);
+
+export const getNoVaults = (type: VaultType, list: VaultData[]): number =>
+	FP.pipe(
+		list,
+		A.reduce(0, (acc, curr) => (curr.type === type ? acc + 1 : acc))
+	);
