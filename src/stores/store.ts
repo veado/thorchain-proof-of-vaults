@@ -54,9 +54,9 @@ const loadAsgards = (): TE.TaskEither<Error, Vault[]> =>
 		TE.map(({ data }) => data)
 	);
 
-const loadAsgardsJSON = (): TE.TaskEither<Error, Vault[]> =>
+const loadAsgardsJSON = (id: string): TE.TaskEither<Error, Vault[]> =>
 	FP.pipe(
-		TE.tryCatch(() => import('../../test/responses/churn-8231550/asgard.json'), E.toError),
+		TE.tryCatch(() => import(`../../test/responses/${id}/asgard.json`), E.toError),
 		TE.map((result) => result.default as Vault[])
 	);
 
@@ -66,9 +66,9 @@ const loadPools = (): TE.TaskEither<Error, PoolDetails> =>
 		TE.map(({ data }) => data)
 	);
 
-const loadPoolsJSON = (): TE.TaskEither<Error, PoolDetails> =>
+const loadPoolsJSON = (id: string): TE.TaskEither<Error, PoolDetails> =>
 	FP.pipe(
-		TE.tryCatch(() => import('../../test/responses/churn-8231550/pools.json'), E.toError),
+		TE.tryCatch(() => import(`../../test/responses/${id}/pools.json`), E.toError),
 		TE.map((result) => result.default)
 	);
 
@@ -78,9 +78,9 @@ const loadStats = (): TE.TaskEither<Error, StatsData> =>
 		TE.map(({ data }) => data)
 	);
 
-const loadStatsJSON = (): TE.TaskEither<Error, StatsData> =>
+const loadStatsJSON = (id: string): TE.TaskEither<Error, StatsData> =>
 	FP.pipe(
-		TE.tryCatch(() => import('../../test/responses/churn-8231550/stats.json'), E.toError),
+		TE.tryCatch(() => import(`../../test/responses/${id}/stats.json`), E.toError),
 		TE.map((result) => result.default)
 	);
 
@@ -90,9 +90,9 @@ const loadNodes = (): TE.TaskEither<Error, Node[]> =>
 		TE.map(({ data }) => data)
 	);
 
-const loadNodesJSON = (): TE.TaskEither<Error, Node[]> =>
+const loadNodesJSON = (id: string): TE.TaskEither<Error, Node[]> =>
 	FP.pipe(
-		TE.tryCatch(() => import('../../test/responses/churn-8231550/nodes.json'), E.toError),
+		TE.tryCatch(() => import(`../../test/responses/${id}/nodes.json`), E.toError),
 		TE.map((result) => result.default as Node[])
 	);
 
@@ -112,10 +112,10 @@ export const loadAllData = async () =>
 		// 	}),
 		() =>
 			sequenceSTaskEither({
-				asgards: loadAsgardsJSON(),
-				pools: loadPoolsJSON(),
-				nodes: loadNodesJSON(),
-				stats: loadStatsJSON()
+				asgards: loadAsgardsJSON('churn-8231550'),
+				pools: loadPoolsJSON('churn-8231550'),
+				nodes: loadNodesJSON('churn-8231550'),
+				stats: loadStatsJSON('churn-8231550')
 			}),
 		(seq) =>
 			seq().then(
