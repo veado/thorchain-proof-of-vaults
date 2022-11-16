@@ -7,9 +7,7 @@
 	import {
 		formatAssetAmountCurrency,
 		baseToAsset,
-		formatAssetAmount,
 		assetFromString,
-		trimZeros,
 		assetAmount
 	} from '@xchainjs/xchain-util';
 
@@ -78,10 +76,6 @@
 			{@const asset = assetFromString(vs.id)}
 			{@const total = sumAmounts(vs.vaults)}
 			{@const totalUSD = sumUSDAmounts(vs.vaults)}
-			<!-- {@const totalUSD = FP.pipe(
-				getPrice({ asset, amount: total, poolsData: $pools }),
-				O.toNullable
-			)} -->
 			<!-- vaults wrapper -->
 			<div class="flex flex-row p-10 rounded-xl border border-blue-300 mb-20">
 				<!-- vault overview -->
