@@ -1,4 +1,10 @@
-import type { Node, NodeStatusEnum, Vault, VaultAddress } from '@xchainjs/xchain-thornode';
+import type {
+	Node,
+	NodeStatusEnum,
+	Vault,
+	VaultAddress,
+	VaultTypeEnum
+} from '@xchainjs/xchain-thornode';
 import {
 	baseAmount,
 	type Asset,
@@ -9,7 +15,8 @@ import {
 	bnOrZero,
 	baseToAsset,
 	type AssetAmount,
-	assetAmount
+	assetAmount,
+	eqAsset
 } from '@xchainjs/xchain-util';
 import * as FP from 'fp-ts/lib/function';
 import * as A from 'fp-ts/lib/Array';
@@ -22,7 +29,8 @@ import type {
 	PoolsDataMap,
 	PoolStatus,
 	VaultData,
-	VaultDataMap,
+	VaultList,
+	VaultListData,
 	VaultStatus,
 	VaultType
 } from 'src/types/types';
@@ -110,14 +118,21 @@ export const getPoolStatus = (asset: Asset, poolsData: PoolsDataMap): PoolStatus
 		O.getOrElse(() => 'unknown')
 	);
 
+const toVaultType = (type: VaultTypeEnum): VaultType => {
+	switch (type) {
+		case 'AsgardVault':
+			return 'asgard';
+		case 'YggdrasilVault':
+			return 'ygg';
+	}
+};
+
 const toVaultData = ({
 	vault,
-	poolsData,
-	type
+	poolsData
 }: {
 	vault: Vault;
 	poolsData: PoolsDataMap;
-	type: VaultType;
 }): VaultData[] =>
 	FP.pipe(
 		vault.coins || [], // Important note: coins can be null while churning!
@@ -133,7 +148,7 @@ const toVaultData = ({
 						address: getAddress(vault.addresses, asset.chain),
 						amount: baseAmount(coin.amount, coin?.decimals ?? THORNODE_DECIMAL),
 						amountUSD: getPrice({ asset, amount, poolsData }),
-						type,
+						type: vault.type ? toVaultType(vault.type) : 'unknown',
 						status: (vault?.status ?? 'unknown') as VaultStatus
 					};
 				})
@@ -142,29 +157,41 @@ const toVaultData = ({
 	);
 
 /**
- * Takes vaults (asgard or ygg) to get value of assets
+ * Takes vaults (asgard and/or ygg) to get value of assets
  */
-export const toVaultDataMap = ({
+export const toVaultList = ({
 	vaults,
-	poolsData,
-	type
+	poolsData
 }: {
 	vaults: Vault[];
 	poolsData: PoolsDataMap;
-	type: VaultType;
-}): VaultDataMap =>
+}): VaultList =>
 	FP.pipe(
 		vaults,
-		A.map((vault: Vault) => toVaultData({ vault, poolsData, type })),
+		// get VaultData
+		A.map((vault: Vault) => toVaultData({ vault, poolsData })),
 		A.flatten,
-		A.reduce(new Map<string, VaultData[]>(), (acc, data: VaultData) => {
-			const assetString = assetToString(data.asset);
-			const curr = acc.get(assetString);
-			if (curr) {
-				return acc.set(assetString, [...curr, data]);
+		// ignore zero balances
+		A.filter((v) => v.amount.gt(baseAmount(0))),
+		// Transform [VaultData] -> [{asset: Asset, data: VaultData}]
+		A.reduce<VaultData, Array<Pick<VaultListData, 'asset' | 'data'>>>(
+			[],
+			(acc, data: VaultData) => {
+				const index = acc.findIndex((el) => eqAsset(el.asset, data.asset));
+				if (index !== -1) {
+					acc[index] = { asset: data.asset, data: [...acc[index].data, data] };
+				} else {
+					acc.push({ asset: data.asset, data: [data] });
+				}
+				return acc;
 			}
-			return acc.set(assetString, [data]);
-		})
+		),
+		// Add total + totalUSD
+		A.map<Pick<VaultListData, 'asset' | 'data'>, VaultListData>((v) => ({
+			...v,
+			total: sumAmounts(v.data),
+			totalUSD: O.some(sumUSDAmounts(v.data))
+		}))
 	);
 
 /**

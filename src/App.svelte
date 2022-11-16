@@ -14,10 +14,10 @@
 	import { dataRD, loadAllData, vaults, pools } from './stores/store';
 	import * as RD from '@devexperts/remote-data-ts';
 	import { onMount } from 'svelte';
-	import { getPoolStatus, getPrice, sumAmounts, sumUSDAmounts, trimAddress } from './utils/data';
+	import { getPoolStatus, trimAddress } from './utils/data';
 	import { sequenceSOption } from './utils/fp';
 	import ExternalLinkIcon from './components/ExternalLinkIcon.svelte';
-	import type { PoolStatus, VaultStatus, VaultType } from './types/types';
+	import type { PoolStatus, VaultStatus } from './types/types';
 
 	const getColorByPoolStatus = (status: PoolStatus) => {
 		switch (status) {
@@ -68,66 +68,60 @@
 					() => '...',
 					(error) => error.toString(),
 					({ vaults, pools, nodes }) =>
-						`${vaults.size} ASGARD's / ${pools.size} pools / ${nodes.length} active nodes`
+						`${vaults.length} vaults / ${pools.size} pools / ${nodes.length} active nodes`
 				)
 			)}
 		</div>
 		{#each $vaults as vs}
-			{@const asset = assetFromString(vs.id)}
-			{@const total = sumAmounts(vs.vaults)}
-			{@const totalUSD = sumUSDAmounts(vs.vaults)}
+			{@const asset = vs.asset}
+			{@const poolStatus = getPoolStatus(asset, $pools)}
 			<!-- vaults wrapper -->
 			<div class="flex flex-row p-10 rounded-xl border border-blue-300 mb-20">
 				<!-- vault overview -->
 				<div class="flex flex-col w-[400px] justify-start items-start">
-					{#if asset}
-						<h1 class="text-4xl text-gray-800 leading-none pb-1">{asset.ticker}</h1>
-						<h2 class="text-2xl text-gray-400 py-0 leading-none">{asset.chain}</h2>
-					{:else}
-						<h1 class="text-4xl text-gray-400">Unknown asset</h1>
-					{/if}
+					<h1 class="text-4xl text-gray-800 leading-none pb-1">{asset.ticker}</h1>
+					<h2 class="text-2xl text-gray-400 py-0 leading-none">{asset.chain}</h2>
 					<div class="flex items-center my-2">
 						<div class="bg-blue-300 border rounded-lg text-gray-50 px-1 text-xs uppercase">
-							{vs.vaults.length}
-							{vs.id === 'THOR.RUNE' ? 'nodes' : 'vaults'}
+							{$vaults.length} vaults
 						</div>
-						{#if asset}
-							{@const poolStatus = getPoolStatus(asset, $pools)}
-							{#if vs.id !== 'THOR.RUNE'}
-								<div
-									class={`${getColorByPoolStatus(
-										poolStatus
-									)} border rounded-lg text-gray-50 text-xs ml-1 px-2 uppercase`}
-								>
-									{poolStatus} pool
-								</div>
-							{/if}
-						{/if}
+
+						<div
+							class={`${getColorByPoolStatus(
+								poolStatus
+							)} border rounded-lg text-gray-50 text-xs ml-1 px-2 uppercase`}
+						>
+							{getPoolStatus(asset, $pools)} pool
+						</div>
 					</div>
 					<h3 class="text-3xl text-gray-600 py-0 leading-none">
 						{formatAssetAmountCurrency({
-							amount: baseToAsset(total),
+							amount: baseToAsset(vs.total),
 							asset,
 							trimZeros: true,
 							decimal: 6
 						})}
 					</h3>
 					<h3 class="text-xl text-gray-300 py-0 leading-none pt-1">
-						{#if totalUSD && totalUSD.gt(assetAmount(0))}
-							{formatAssetAmountCurrency({
-								amount: totalUSD,
-								decimal: 2,
-								trimZeros: false
-							})}
-						{:else}
-							Unknown USD price
-						{/if}
+						{FP.pipe(
+							vs.totalUSD,
+							O.chain(O.fromPredicate((totalUSD) => totalUSD.gt(assetAmount(0)))),
+							O.fold(
+								() => 'Unknown USD price',
+								(totalUSD) =>
+									formatAssetAmountCurrency({
+										amount: totalUSD,
+										decimal: 2,
+										trimZeros: false
+									})
+							)
+						)}
 					</h3>
 				</div>
 				<div class="flex items-center px-10 ">=></div>
 				<!-- vault details -->
 				<div>
-					{#each vs.vaults as v}
+					{#each vs.data as v}
 						{@const addr = O.getOrElse(() => '')(v.address)}
 						<div class="flex flex-col border-b last:border-b-0 border-gray-200 py-3 px-5">
 							<div class="flex items-center">

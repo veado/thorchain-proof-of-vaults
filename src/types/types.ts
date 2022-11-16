@@ -4,7 +4,7 @@ import type * as RD from '@devexperts/remote-data-ts';
 import type BigNumber from 'bignumber.js';
 import type { BaseAmount, Address, Asset, AssetAmount } from '@xchainjs/xchain-util';
 
-export type VaultType = 'asgard' | 'ygg' | 'bond';
+export type VaultType = 'asgard' | 'ygg' | 'bond' | 'unknown';
 export type VaultStatus =
 	| 'RetiringVault'
 	| 'ActiveVault'
@@ -22,12 +22,20 @@ export type VaultData = {
 	status: VaultStatus;
 };
 
-export type VaultDataMap = Map<string /* asset string */, VaultData[]>;
 export type BondsDataMap = Map<'THOR.RUNE', VaultData[]>;
+
+export type VaultListData = {
+	asset: Asset;
+	total: BaseAmount;
+	totalUSD: O.Option<AssetAmount>;
+	data: VaultData[];
+};
+
+export type VaultList = VaultListData[];
 
 export type DataAD = RD.RemoteData<
 	Error,
-	{ vaults: VaultDataMap; pools: PoolsDataMap; nodes: Node[] }
+	{ vaults: VaultList; pools: PoolsDataMap; nodes: Node[] }
 >;
 
 export type NodeBondsMap = Map<Address, BaseAmount>;
