@@ -11,7 +11,7 @@
 		assetAmount
 	} from '@xchainjs/xchain-util';
 
-	import { dataRD, loadAllData, vaults, pools } from './stores/store';
+	import { dataRD$, loadAllData, vaults$, pools$, timeLeft$, autoReload$$ } from './stores/store';
 	import * as RD from '@devexperts/remote-data-ts';
 	import { onMount } from 'svelte';
 	import { getNoVaults, getPoolStatus, trimAddress } from './utils/data';
@@ -19,52 +19,62 @@
 	import ExternalLinkIcon from './components/IconExternalLink.svelte';
 	import type { PoolStatus, VaultStatus, VaultType } from './types/types';
 	import AssetIcon from './components/AssetIcon.svelte';
+	import LoaderIcon from './components/LoaderIcon.svelte';
 
-	const getColorByPoolStatus = (status: PoolStatus) => {
+	const labelPoolStatus = (status: PoolStatus) => {
 		switch (status) {
 			case 'available':
-				return 'bg-cyan-500';
+				return 'active';
 			case 'staged':
-				return 'bg-stone-300';
+				return 'pending';
 			case 'suspended':
-				return 'bg-gray-300';
+				return 'inactive';
 			case 'unknown':
-				return 'bg-gray-300';
+				return 'unknown';
 		}
 	};
 
-	const getColorByVaultStatus = (status: VaultStatus) => {
+	const labelVaultStatus = (status: VaultStatus) => {
 		switch (status) {
 			case 'ActiveVault':
 			case 'Active':
-				return 'bg-cyan-500';
+				return 'active';
 			case 'RetiringVault':
+				return 'retiring';
 			case 'Standby':
-				return 'bg-stone-300';
+				return 'standby';
 			case 'unknown':
-				return 'bg-gray-300';
+				return 'unkown';
 		}
 	};
 
-	const getColorByVaultType = (type: VaultType) => {
+	const labelVaultType = (type: VaultType) => {
 		switch (type) {
 			case 'asgard':
-				return 'bg-lime-500';
+				return 'asgard';
 			case 'ygg':
-				return 'bg-yellow-500';
+				return 'Yggdrasil';
 			case 'bond':
-				return 'bg-black-300';
+				return 'bond';
 			case 'unknown':
-				return 'bg-gray-300';
+				return 'unknown';
 		}
 	};
+
+	$: loading = RD.isPending($dataRD$);
+
+	$: emptyData = $vaults$.length <= 0 || $pools$.size <= 0;
 
 	// load all data on start
 	onMount(loadAllData);
 </script>
 
-<main class="flex flex-col bg-gray-100 p-10 md:p-20">
-	<div class="container bg-white flex flex-col p-10 md:p-20 shadow-md">
+<main class={`flex flex-col bg-gray-100 p-10 md:p-20 ${emptyData ? 'h-screen' : ''}`}>
+	<div
+		class={`container bg-white flex flex-col p-10 md:p-20 shadow-md ${
+			emptyData ? 'min-h-full' : ''
+		}`}
+	>
 		<div class="flex justify-center mb-5">
 			<img
 				src={logo}
@@ -73,22 +83,42 @@
 			/>
 		</div>
 		<h1 class="text-2xl text-center uppercase">Proof Of Vaults</h1>
-		<button class=" text-gray-300" on:click={loadAllData}>Reload data</button>
-		<div>
-			{FP.pipe(
-				$dataRD,
-				RD.fold(
-					() => '...',
-					() => '...',
-					(error) => error.toString(),
-					({ vaults, pools, nodes }) =>
-						`${vaults.length} vaults / ${pools.size} pools / ${nodes.length} active nodes`
-				)
-			)}
+		<div class="flex flex-col justify-center items-center my-10">
+			<button
+				class={`flex items-center w-auto px-6 py-2 text-lg bg-gray-700 text-white rounded-full uppercase shadow-md hover:bg-gray-600 hover:shadow-lg ${
+					loading ? 'cursor-not-allowed' : 'cursor-pointer'
+				}`}
+				on:click={loadAllData}
+				disabled={loading}
+			>
+				<LoaderIcon class={`mr-2 ${!loading ? 'hidden' : ''}`} />
+				Reload data
+			</button>
+
+			<div class="flex items-center py-2">
+				<input
+					id="autoreload"
+					type="checkbox"
+					class="peer h-4 w-4 border-gray-400 checked:border-none checked:text-gray-500 focus:ring-0"
+					checked={$autoReload$$}
+					disabled={loading}
+					on:change={() => autoReload$$.update((v) => !v)}
+				/>
+				<label
+					class={`text-sm ml-2 
+          ${
+						loading
+							? 'text-gray-300 cursor-not-allowed'
+							: 'text-gray-400 cursor-pointer hover:text-gray-500 peer-checked:text-gray-500'
+					} `}
+					for="autoreload"
+					>Auto reload ({new Date($timeLeft$ * 1000).toISOString().substring(14, 19)})</label
+				>
+			</div>
 		</div>
-		{#each $vaults as vs}
+		{#each $vaults$ as vs}
 			{@const asset = vs.asset}
-			{@const poolStatus = getPoolStatus(asset, $pools)}
+			{@const poolStatus = getPoolStatus(asset, $pools$)}
 			{@const noAsgards = getNoVaults('asgard', vs.data)}
 			{@const noYggs = getNoVaults('ygg', vs.data)}
 			<!-- vaults wrapper -->
@@ -134,29 +164,24 @@
 							</h3>
 						</div>
 					</div>
-					<div class="flex items-start mt-10">
-						<div
-							class={`${getColorByVaultType(
-								'asgard'
-							)} rounded-lg text-gray-50 px-3 text-xs xl:text-base uppercase`}
-						>
+					<div class="flex justify-center my-4">
+						<LoaderIcon class={`text-gray-400 ${loading ? 'visible' : 'invisible'}`} />
+					</div>
+					<div class="flex items-center">
+						<div class={` text-gray-500 px-3 text-base xl:text-lg uppercase`}>
 							{noAsgards} Asgards
 						</div>
 						{#if noYggs > 0}
 							<div
-								class={`${getColorByVaultType(
-									'ygg'
-								)} rounded-lg text-gray-50 px-3 text-xs xl:text-base uppercase ml-2`}
+								class={`border-l border-gray-300 text-gray-500 px-3 text-base xl:text-lg uppercase`}
 							>
 								{noYggs} Yggdrasils
 							</div>
 						{/if}
 						<div
-							class={`${getColorByPoolStatus(
-								poolStatus
-							)} rounded-lg text-gray-50 text-xs xl:text-base ml-2 px-3 uppercase`}
+							class={`border-l border-gray-300 text-gray-500 px-3  text-base xl:text-lg uppercase`}
 						>
-							{getPoolStatus(asset, $pools)} pool
+							{labelPoolStatus(getPoolStatus(asset, $pools$))} pool
 						</div>
 					</div>
 				</div>
@@ -164,29 +189,14 @@
 				<div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3 xl:gap-6 mt-20">
 					{#each vs.data as v}
 						{@const addr = O.getOrElse(() => '')(v.address)}
-						<div class="flex flex-col items-center py-3 px-5 bg-gray-50 rounded-lg">
-							<div class="flex items-center">
-								<div
-									class={`${getColorByVaultType(
-										v.type
-									)} rounded-lg text-gray-50 px-3 text-xs uppercase`}
-								>
-									{v.type}
-								</div>
-								<div
-									class={`${getColorByVaultStatus(
-										v.status
-									)} rounded-lg text-gray-50 px-3 text-xs ml-2 uppercase`}
-								>
-									{v.status}
-								</div>
+						<div class="flex flex-col items-center bg-gray-50 rounded-lg">
+							<div
+								class={`w-full text-center bg-gray-100 text-gray-500 text-xs uppercase py-3 px-2  rounded-t-lg`}
+							>
+								{labelVaultType(v.type)}
+								<span class="lower-case">({labelVaultStatus(v.status)})</span>
 							</div>
-							{#if !!addr}
-								<div class="flex items-center text-base text-indigo-600 ml-2" title={addr}>
-									<span class="">{trimAddress(addr)} </span><ExternalLinkIcon class="ml-1" />
-								</div>
-							{/if}
-							<div class="text-lg text-gray-600 leading-none">
+							<div class="text-xl text-gray-600 leading-none pt-4">
 								{formatAssetAmountCurrency({
 									amount: baseToAsset(v.amount),
 									asset: v.asset,
@@ -194,7 +204,7 @@
 									trimZeros: true
 								})}
 							</div>
-							<div class="text-base text-gray-300 leading-none">
+							<div class="text-base text-gray-400 leading-none  pt-2">
 								{FP.pipe(
 									sequenceSOption({
 										asset: O.fromNullable(assetFromString('BNB.BUSD')),
@@ -206,6 +216,14 @@
 									O.getOrElse(() => 'Unknown USD price')
 								)}
 							</div>
+							{#if !!addr}
+								<div
+									class="flex justify-center items-center text-base text-gray-600 pt-3 pb-4"
+									title={addr}
+								>
+									<span class="">{trimAddress(addr)} </span><ExternalLinkIcon class="ml-1" />
+								</div>
+							{/if}
 						</div>
 					{/each}
 				</div>
