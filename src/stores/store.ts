@@ -6,8 +6,8 @@ import {
 } from '@xchainjs/xchain-thornode';
 import type { Vault } from '@xchainjs/xchain-thornode';
 import * as FP from 'fp-ts/lib/function';
-import { THORNODE_URL } from './const';
-import { derived, writable, type Readable, type Writable } from 'svelte/store';
+import { MAX_REALOAD_COUNTER, THORNODE_URL } from './const';
+import { derived, get, writable, type Readable, type Writable } from 'svelte/store';
 import * as E from 'fp-ts/lib/Either';
 import * as RD from '@devexperts/remote-data-ts';
 
@@ -18,7 +18,13 @@ import type { PoolDetails, StatsData } from '@xchainjs/xchain-midgard';
 import { Configuration as MidgardConfig, DefaultApi } from '@xchainjs/xchain-midgard';
 import { sequenceSTaskEither } from '../utils/fp';
 import type { DataAD, PoolsDataMap, VaultList } from '../types/types';
-import { getPoolsData, toNodesVaultDataMap, toNodesMap, toVaultList } from '../utils/data';
+import {
+	getPoolsData,
+	toNodesVaultDataMap,
+	toNodesMap,
+	toVaultList,
+	toReadable
+} from '../utils/data';
 import { assetAmount } from '@xchainjs/xchain-util';
 
 const midgardConfig = new MidgardConfig({ basePath: MIDGARD_URL });
@@ -28,22 +34,71 @@ const thornodeConfig = new ThornodeConfig({ basePath: THORNODE_URL });
 const vaultsApi = new VaultsApi(thornodeConfig);
 const nodesApi = new NodesApi(thornodeConfig);
 
-// All data (incl. loading/error status)
-export const dataRD: Writable<DataAD> = writable(RD.pending);
-export const vaults: Readable<VaultList> = derived(dataRD, (dataRD) =>
+const dataRD$$: Writable<DataAD> = writable(RD.pending);
+export const dataRD$: Readable<DataAD> = toReadable(dataRD$$);
+
+const _vaults = writable<VaultList>([]);
+export const vaults$: Readable<VaultList> = derived(dataRD$, (dataRD) =>
 	FP.pipe(
 		dataRD,
-		RD.map(({ vaults }) => vaults),
-		RD.getOrElse(() => [])
+		RD.map(({ vaults }) => {
+			_vaults.set(vaults);
+			return vaults;
+		}),
+		RD.getOrElse(() => get(_vaults))
 	)
 );
 
-export const pools: Readable<PoolsDataMap> = derived(dataRD, (dataRD) =>
+const _pools = writable<PoolsDataMap>(new Map());
+export const pools$: Readable<PoolsDataMap> = derived(dataRD$, (dataRD) =>
 	FP.pipe(
 		dataRD,
-		RD.map(({ pools }) => pools),
-		RD.getOrElse(() => new Map())
+		RD.map(({ pools }) => {
+			_pools.set(pools);
+			return pools;
+		}),
+		RD.getOrElse(() => get(_pools))
 	)
+);
+
+export const autoReload$$ = writable(true);
+
+let _counter = 0;
+
+const counter$: Readable<number> = derived(
+	[autoReload$$, dataRD$],
+	([autoReload, dataRD], set: (v: number) => void) => {
+		let intervalId: NodeJS.Timer | undefined;
+		const reset = () => {
+			intervalId && clearInterval(intervalId);
+			_counter = 0;
+			set(_counter);
+		};
+		if (autoReload && !RD.isPending(dataRD)) {
+			reset();
+			intervalId = setInterval(() => {
+				_counter++;
+				set(_counter);
+				console.log('setInterval:', _counter);
+			}, 1000);
+		} else {
+			reset();
+		}
+
+		return reset;
+	}
+);
+
+counter$.subscribe((value) => {
+	console.log('sub counter:', value);
+	if (value >= MAX_REALOAD_COUNTER) {
+		loadAllData();
+	}
+});
+
+export const timeLeft$: Readable<number> = derived(
+	counter$,
+	(counter) => MAX_REALOAD_COUNTER - counter
 );
 
 const loadAsgards = (): TE.TaskEither<Error, Vault[]> =>
@@ -112,7 +167,7 @@ const _2 = [loadAsgardsJSON, loadYggsJSON, loadPoolsJSON, loadNodesJSON, loadSta
 export const loadAllData = async () =>
 	FP.pipe(
 		// pending
-		dataRD.set(RD.pending),
+		dataRD$$.set(RD.pending),
 		() =>
 			sequenceSTaskEither({
 				asgards: loadAsgards(),
@@ -122,18 +177,18 @@ export const loadAllData = async () =>
 				stats: loadStats()
 			}),
 		// () =>
-		// sequenceSTaskEither({
-		// 	asgards: loadAsgardsJSON('churn-8231550'),
-		// 	yggs: loadYggsJSON('churn-8231550'),
-		// 	pools: loadPoolsJSON('churn-8231550'),
-		// 	nodes: loadNodesJSON('churn-8231550'),
-		// 	stats: loadStatsJSON('churn-8231550')
-		// }),
+		// 	sequenceSTaskEither({
+		// 		asgards: loadAsgardsJSON('churn-8231550'),
+		// 		yggs: loadYggsJSON('churn-8231550'),
+		// 		pools: loadPoolsJSON('churn-8231550'),
+		// 		nodes: loadNodesJSON('churn-8231550'),
+		// 		stats: loadStatsJSON('churn-8231550')
+		// 	}),
 		(seq) =>
 			seq().then(
 				E.fold(
 					(e) => {
-						dataRD.set(RD.failure(e));
+						dataRD$$.set(RD.failure(e));
 					},
 					({ asgards, yggs, pools, nodes, stats }) => {
 						const poolsDataMap = getPoolsData(pools);
@@ -149,7 +204,7 @@ export const loadAllData = async () =>
 							nodes: nodesMap
 						});
 
-						dataRD.set(RD.success({ vaults: vaultList, pools: poolsDataMap, nodes }));
+						dataRD$$.set(RD.success({ vaults: vaultList, pools: poolsDataMap, nodes }));
 					}
 				)
 			)

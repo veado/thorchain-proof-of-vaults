@@ -17,3 +17,5 @@ export const AssetTGTERC20: Asset = {
 	ticker: 'TGT',
 	synth: false
 };
+
+export const MAX_REALOAD_COUNTER = 5 * 60; // 5min

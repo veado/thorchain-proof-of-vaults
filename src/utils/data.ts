@@ -39,6 +39,10 @@ import type {
 import { THORNODE_DECIMAL } from '../stores/const';
 import type { PoolDetail, PoolDetails } from '@xchainjs/xchain-midgard';
 import { monoidAssetAmount, monoidBaseAmount, sequenceSOption } from './fp';
+import { derived, type Readable, type Writable } from 'svelte/store';
+
+/** Helper to convert Writable -> Readable */
+export const toReadable = <T>(v$$: Writable<T>): Readable<T> => derived(v$$, FP.identity);
 
 export const toNodesMap = (nodes: Node[]): NodesMap =>
 	FP.pipe(
