@@ -93,9 +93,8 @@
 		<h1 class="text-2xl text-center uppercase">Proof Of Vaults</h1>
 		<div class="flex flex-col justify-center items-center my-10">
 			<button
-				class={`flex items-center w-auto px-6 py-2 text-lg bg-gray-500 text-white rounded-full uppercase shadow-md hover:bg-gray-600 hover:shadow-lg ${
-					loading ? 'cursor-not-allowed' : 'cursor-pointer'
-				}`}
+				class={`flex items-center w-auto px-6 py-2 text-lg bg-gray-500 text-white rounded-full uppercase shadow-md
+         hover:bg-gray-600 hover:shadow-lg ${loading ? 'cursor-not-allowed' : 'cursor-pointer'}`}
 				on:click={loadAllData}
 				disabled={loading}
 			>
@@ -147,7 +146,6 @@
 		</div>
 		{#each $vaults$ as vs}
 			{@const asset = vs.asset}
-			{@const poolStatus = getPoolStatus(asset, $pools$)}
 			{@const noAsgards = getNoVaults('asgard', vs.data)}
 			{@const noYggs = getNoVaults('ygg', vs.data)}
 			<!-- vaults wrapper -->

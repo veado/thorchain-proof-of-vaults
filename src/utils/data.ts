@@ -39,7 +39,12 @@ import type {
 } from 'src/types/types';
 import { THORNODE_DECIMAL } from '../stores/const';
 import type { PoolDetail, PoolDetails } from '@xchainjs/xchain-midgard';
-import { monoidAssetAmount, monoidBaseAmount, sequenceSOption } from './fp';
+import {
+	monoidAssetAmount,
+	monoidBaseAmount,
+	ordVaultDataByTypeStatusReverse,
+	sequenceSOption
+} from './fp';
 import { derived, type Readable, type Writable } from 'svelte/store';
 
 /**
@@ -62,13 +67,6 @@ export const convertBaseAmountDecimal = (amount: BaseAmount, decimal: number): B
 			: amount.amount().multipliedBy(bn(10 ** decimalDiff));
 	return baseAmount(amountBN, decimal);
 };
-
-/**
- * Helper to check whether an Asset is an USD Asset
- * COPIED from ASGARDEX
- * @see https://github.com/thorchain/asgardex-electron/blob/681b5f1231b43b63f8861a775d139ca6826b02b8/src/renderer/helpers/assetHelper.ts#L244
- */
-const isUSDAsset = ({ ticker }: Asset): boolean => ticker.includes('USD') || ticker.includes('UST');
 
 /** Helper to convert Writable -> Readable */
 export const toReadable = <T>(v$$: Writable<T>): Readable<T> => derived(v$$, FP.identity);
@@ -245,6 +243,11 @@ export const toVaultList = ({
 			...v,
 			total: sumAmounts(v.data),
 			totalUSD: O.some(sumUSDAmounts(v.data))
+		})),
+		// sort data
+		A.map<VaultListData, VaultListData>((v) => ({
+			...v,
+			data: FP.pipe(v.data, A.sort(ordVaultDataByTypeStatusReverse))
 		}))
 	);
 

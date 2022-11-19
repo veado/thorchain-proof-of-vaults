@@ -198,6 +198,14 @@ export const loadAllData = async () =>
 		// 		nodes: loadNodes(),
 		// 		stats: loadStats()
 		// 	}),
+		// () =>
+		// 	sequenceSTaskEither({
+		// 		asgards: loadAsgardsJSON('churn-8231550'),
+		// 		yggs: loadYggsJSON('churn-8231550'),
+		// 		pools: loadPoolsJSON('churn-8231550'),
+		// 		nodes: loadNodesJSON('churn-8231550'),
+		// 		stats: loadStatsJSON('churn-8231550')
+		// 	}),
 		() =>
 			sequenceSTaskEither({
 				asgards: loadAsgardsJSON('8295828'),
