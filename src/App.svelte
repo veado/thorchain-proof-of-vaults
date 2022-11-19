@@ -11,7 +11,15 @@
 		assetAmount
 	} from '@xchainjs/xchain-util';
 
-	import { dataRD$, loadAllData, vaults$, pools$, timeLeft$, autoReload$$ } from './stores/store';
+	import {
+		dataRD$,
+		loadAllData,
+		vaultsSorted$ as vaults$,
+		pools$,
+		timeLeft$,
+		autoReload$$,
+		vaultSort$$
+	} from './stores/store';
 	import * as RD from '@devexperts/remote-data-ts';
 	import { onMount } from 'svelte';
 	import { getNoVaults, getPoolStatus, trimAddress } from './utils/data';
@@ -85,9 +93,8 @@
 		<h1 class="text-2xl text-center uppercase">Proof Of Vaults</h1>
 		<div class="flex flex-col justify-center items-center my-10">
 			<button
-				class={`flex items-center w-auto px-6 py-2 text-lg bg-gray-700 text-white rounded-full uppercase shadow-md hover:bg-gray-600 hover:shadow-lg ${
-					loading ? 'cursor-not-allowed' : 'cursor-pointer'
-				}`}
+				class={`flex items-center w-auto px-6 py-2 text-lg bg-gray-500 text-white rounded-full uppercase shadow-md
+         hover:bg-gray-600 hover:shadow-lg ${loading ? 'cursor-not-allowed' : 'cursor-pointer'}`}
 				on:click={loadAllData}
 				disabled={loading}
 			>
@@ -109,16 +116,36 @@
           ${
 						loading
 							? 'text-gray-300 cursor-not-allowed'
-							: 'text-gray-400 cursor-pointer hover:text-gray-500 peer-checked:text-gray-500'
+							: 'text-gray-400 cursor-pointer hover:text-gray-600 peer-checked:text-gray-500'
 					} `}
 					for="autoreload"
 					>Auto reload ({new Date($timeLeft$ * 1000).toISOString().substring(14, 19)})</label
 				>
 			</div>
 		</div>
+		<div class="flex itmes-center py-4">
+			<select
+				class="form-select appearance-none
+          block
+          w-[200px]
+          px-3
+          py-1.5
+          text-base
+          font-normal
+          text-gray-500
+          bg-white bg-clip-padding bg-no-repeat
+          border border-solid border-gray-400 focus:border-gray-600 focus:ring-0
+          focus:outline-none"
+				bind:value={$vaultSort$$}
+			>
+				<option value="usd">USD ↑</option>
+				<option value="usdRev">USD ↓</option>
+				<option value="name">Asset ↑</option>
+				<option value="nameRev">Asset ↓</option>
+			</select>
+		</div>
 		{#each $vaults$ as vs}
 			{@const asset = vs.asset}
-			{@const poolStatus = getPoolStatus(asset, $pools$)}
 			{@const noAsgards = getNoVaults('asgard', vs.data)}
 			{@const noYggs = getNoVaults('ygg', vs.data)}
 			<!-- vaults wrapper -->
@@ -152,7 +179,7 @@
 									vs.totalUSD,
 									O.chain(O.fromPredicate((totalUSD) => totalUSD.gt(assetAmount(0)))),
 									O.fold(
-										() => 'Unknown USD price',
+										() => '$ unknown price',
 										(totalUSD) =>
 											formatAssetAmountCurrency({
 												amount: totalUSD,
@@ -213,7 +240,7 @@
 									O.map(({ asset, amount }) =>
 										formatAssetAmountCurrency({ amount, asset, decimal: 2, trimZeros: false })
 									),
-									O.getOrElse(() => 'Unknown USD price')
+									O.getOrElse(() => '$ unknown price')
 								)}
 							</div>
 							{#if !!addr}

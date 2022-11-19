@@ -112,8 +112,8 @@
 			}
 		],
 		"status": "Active",
-		"bond": "75520824997508",
-		"total_value": "3198495973",
+		"bond": "75660552245889",
+		"total_value": "3042019342",
 		"addresses": [
 			{
 				"chain": "BCH",
@@ -155,7 +155,7 @@
 		"coins": [
 			{
 				"asset": "BCH.BCH",
-				"amount": "36136837"
+				"amount": "35771470"
 			},
 			{
 				"asset": "LTC.LTC",
@@ -179,7 +179,7 @@
 			},
 			{
 				"asset": "BNB.BNB",
-				"amount": "318309"
+				"amount": "310809"
 			},
 			{
 				"asset": "BNB.BTCB-1DE",
@@ -223,7 +223,7 @@
 			},
 			{
 				"asset": "BNB.TWT-8C2",
-				"amount": "1283436519"
+				"amount": "255038488"
 			},
 			{
 				"asset": "ETH.YFI-0X0BC529C00C6401AEF6D220BE8C6EA1667F6AD93E",
@@ -250,7 +250,7 @@
 			"THOR"
 		],
 		"inbound_tx_count": 284,
-		"outbound_tx_count": 2665,
+		"outbound_tx_count": 2667,
 		"routers": [
 			{
 				"chain": "ETH",
@@ -262,8 +262,8 @@
 			}
 		],
 		"status": "Active",
-		"bond": "84676327238765",
-		"total_value": "7948792791",
+		"bond": "84833015541800",
+		"total_value": "5613091005",
 		"addresses": [
 			{
 				"chain": "BCH",
@@ -412,8 +412,8 @@
 			}
 		],
 		"status": "Active",
-		"bond": "95532387636723",
-		"total_value": "118682001",
+		"bond": "95700091943713",
+		"total_value": "111316695",
 		"addresses": [
 			{
 				"chain": "BCH",
@@ -446,220 +446,6 @@
 			{
 				"chain": "THOR",
 				"address": "thor1yf4jeq3euekw6uwgukwgtg97zxasxvu7lnvssh"
-			}
-		]
-	},
-	{
-		"block_height": 2943256,
-		"pub_key": "thorpub1addwnpepq0xxz57rh9ws0qm6x9cj25zm8ax7mjp98qprfy2y089xwrn5fsuv6x6gpty",
-		"coins": [
-			{
-				"asset": "BCH.BCH",
-				"amount": "0"
-			},
-			{
-				"asset": "LTC.LTC",
-				"amount": "0"
-			},
-			{
-				"asset": "BTC.BTC",
-				"amount": "0"
-			},
-			{
-				"asset": "BNB.BUSD-BD1",
-				"amount": "0"
-			},
-			{
-				"asset": "BNB.AVA-645",
-				"amount": "0"
-			},
-			{
-				"asset": "BNB.BNB",
-				"amount": "0"
-			},
-			{
-				"asset": "BNB.ETH-1C9",
-				"amount": "0"
-			},
-			{
-				"asset": "BNB.TWT-8C2",
-				"amount": "0"
-			},
-			{
-				"asset": "BNB.BTCB-1DE",
-				"amount": "0"
-			},
-			{
-				"asset": "ETH.HOT-0X6C6EE5E31D828DE241282B9606C8E98EA48526E2",
-				"amount": "0"
-			},
-			{
-				"asset": "ETH.ETH",
-				"amount": "19944"
-			},
-			{
-				"asset": "ETH.XRUNE-0X69FA0FEE221AD11012BAB0FDB45D444D3D2CE71C",
-				"amount": "0"
-			},
-			{
-				"asset": "ETH.PERP-0XBC396689893D065F41BC2C6ECBEE5E0085233447",
-				"amount": "0"
-			},
-			{
-				"asset": "ETH.YFI-0X0BC529C00C6401AEF6D220BE8C6EA1667F6AD93E",
-				"amount": "0"
-			},
-			{
-				"asset": "ETH.CREAM-0X2BA592F78DB6436527729929AAF6C908497CB200",
-				"amount": "0"
-			},
-			{
-				"asset": "ETH.USDT-0XDAC17F958D2EE523A2206206994597C13D831EC7",
-				"amount": "0",
-				"decimals": 6
-			},
-			{
-				"asset": "ETH.SUSHI-0X6B3595068778DD592E39A122F4F5A5CF09C90FE2",
-				"amount": "0"
-			},
-			{
-				"asset": "ETH.ALPHA-0XA1FAA113CBE53436DF28FF0AEE54275C13B40975",
-				"amount": "0"
-			},
-			{
-				"asset": "ETH.USDC-0XA0B86991C6218B36C1D19D4A2E9EB0CE3606EB48",
-				"amount": "0",
-				"decimals": 6
-			},
-			{
-				"asset": "ETH.FOX-0XC770EEFAD204B5180DF6A14EE197D99D808EE52D",
-				"amount": "0"
-			},
-			{
-				"asset": "ETH.RAZE-0X5EAA69B29F99C84FE5DE8200340B4E9B4AB38EAC",
-				"amount": "0"
-			},
-			{
-				"asset": "ETH.AAVE-0X7FC66500C84A76AD7E9C93437BFC5AC33E2DDAE9",
-				"amount": "0"
-			},
-			{
-				"asset": "ETH.SNX-0XC011A73EE8576FB46F5E1C5751CA3B9FE0AF2A6F",
-				"amount": "0"
-			},
-			{
-				"asset": "ETH.THOR-0XA5F2211B9B8170F694421F2046281775E8468044",
-				"amount": "0"
-			},
-			{
-				"asset": "ETH.KYL-0X67B6D479C7BB412C54E03DCA8E1BC6740CE6B99C",
-				"amount": "0"
-			},
-			{
-				"asset": "ETH.DODO-0X43DFC4159D86F3A37A5A4B3D4580B888AD7D4DDD",
-				"amount": "0"
-			},
-			{
-				"asset": "ETH.HEGIC-0X584BC13C7D411C00C01A62E8019472DE68768430",
-				"amount": "0"
-			},
-			{
-				"asset": "ETH.ALCX-0XDBDB4D16EDA451D0503B854CF79D55697F90C8DF",
-				"amount": "0"
-			},
-			{
-				"asset": "ETH.TGT-0X108A850856DB3F85D0269A2693D896B394C80325",
-				"amount": "0"
-			},
-			{
-				"asset": "DOGE.DOGE",
-				"amount": "0"
-			},
-			{
-				"asset": "ETH.WBTC-0X2260FAC5E5542A773AA44FBCFEDF7C193BC2C599",
-				"amount": "0"
-			},
-			{
-				"asset": "ETH.XDEFI-0X72B886D09C117654AB7DA13A14D603001DE0B777",
-				"amount": "0"
-			},
-			{
-				"asset": "TERRA.LUNA",
-				"amount": "0",
-				"decimals": 6
-			},
-			{
-				"asset": "TERRA.UST",
-				"amount": "0",
-				"decimals": 6
-			},
-			{
-				"asset": "ETH.DAI-0X6B175474E89094C44DA98B954EEDEAC495271D0F",
-				"amount": "0"
-			}
-		],
-		"type": "YggdrasilVault",
-		"status_since": 2943256,
-		"membership": [
-			"thorpub1addwnpepq0xxz57rh9ws0qm6x9cj25zm8ax7mjp98qprfy2y089xwrn5fsuv6x6gpty"
-		],
-		"chains": [
-			"BCH",
-			"BNB",
-			"BTC",
-			"ETH",
-			"LTC",
-			"THOR",
-			"DOGE",
-			"TERRA"
-		],
-		"inbound_tx_count": 299,
-		"outbound_tx_count": 2344,
-		"routers": [
-			{
-				"chain": "ETH",
-				"router": "0xD37BbE5744D730a1d98d8DC97c42F0Ca46aD7146"
-			},
-			{
-				"chain": "AVAX",
-				"router": "0x8F66c4AE756BEbC49Ec8B81966DD8bba9f127549"
-			}
-		],
-		"status": "Standby",
-		"bond": "56933871923329",
-		"total_value": "21288213",
-		"addresses": [
-			{
-				"chain": "BCH",
-				"address": "qr9l2lvexj7kxadk0mxydwp9xscjc74mmyekcuz8ma"
-			},
-			{
-				"chain": "BNB",
-				"address": "bnb1e06hmxf5h43htdn7e3rtsff5xyk84w7e32z6p7"
-			},
-			{
-				"chain": "BTC",
-				"address": "bc1qe06hmxf5h43htdn7e3rtsff5xyk84w7e95raya"
-			},
-			{
-				"chain": "ETH",
-				"address": "0x8b6e1906041afe13ef53c15f732912fa38e18ef7"
-			},
-			{
-				"chain": "LTC",
-				"address": "ltc1qe06hmxf5h43htdn7e3rtsff5xyk84w7epgeeud"
-			},
-			{
-				"chain": "THOR",
-				"address": "thor1e06hmxf5h43htdn7e3rtsff5xyk84w7e4fyd40"
-			},
-			{
-				"chain": "DOGE",
-				"address": "DPjXoBpAakzTnXXYLSQzwBfvfU3UB8bGjK"
-			},
-			{
-				"chain": "TERRA",
-				"address": "terra1e06hmxf5h43htdn7e3rtsff5xyk84w7e428kzs"
 			}
 		]
 	},
@@ -780,8 +566,8 @@
 			}
 		],
 		"status": "Active",
-		"bond": "66599419438882",
-		"total_value": "9449369984",
+		"bond": "69615424903059",
+		"total_value": "9046964550",
 		"addresses": [
 			{
 				"chain": "BCH",
@@ -938,8 +724,8 @@
 			}
 		],
 		"status": "Active",
-		"bond": "95653202664885",
-		"total_value": "139748195",
+		"bond": "95821233811118",
+		"total_value": "131075538",
 		"addresses": [
 			{
 				"chain": "BCH",
@@ -1152,8 +938,8 @@
 			}
 		],
 		"status": "Active",
-		"bond": "80585296594732",
-		"total_value": "5061598157",
+		"bond": "80733910057688",
+		"total_value": "4893237171",
 		"addresses": [
 			{
 				"chain": "BCH",
@@ -1302,8 +1088,8 @@
 			}
 		],
 		"status": "Active",
-		"bond": "90739362963923",
-		"total_value": "4616949815",
+		"bond": "90907057328213",
+		"total_value": "4402717972",
 		"addresses": [
 			{
 				"chain": "BCH",
@@ -1345,7 +1131,7 @@
 		"coins": [
 			{
 				"asset": "BCH.BCH",
-				"amount": "15949918"
+				"amount": "0"
 			},
 			{
 				"asset": "ETH.DODO-0X43DFC4159D86F3A37A5A4B3D4580B888AD7D4DDD",
@@ -1353,7 +1139,7 @@
 			},
 			{
 				"asset": "LTC.LTC",
-				"amount": "2753441"
+				"amount": "0"
 			},
 			{
 				"asset": "ETH.ALPHA-0XA1FAA113CBE53436DF28FF0AEE54275C13B40975",
@@ -1361,7 +1147,7 @@
 			},
 			{
 				"asset": "BTC.BTC",
-				"amount": "22071"
+				"amount": "0"
 			},
 			{
 				"asset": "ETH.THOR-0XA5F2211B9B8170F694421F2046281775E8468044",
@@ -1427,19 +1213,19 @@
 			},
 			{
 				"asset": "ETH.ETH",
-				"amount": "292480"
+				"amount": "14958"
 			},
 			{
 				"asset": "BNB.TWT-8C2",
-				"amount": "914219212"
+				"amount": "0"
 			},
 			{
 				"asset": "BNB.ETH-1C9",
-				"amount": "498845"
+				"amount": "0"
 			},
 			{
 				"asset": "BNB.BNB",
-				"amount": "88644"
+				"amount": "0"
 			},
 			{
 				"asset": "BNB.AVA-645",
@@ -1447,11 +1233,11 @@
 			},
 			{
 				"asset": "BNB.BUSD-BD1",
-				"amount": "71182748"
+				"amount": "0"
 			},
 			{
 				"asset": "BNB.BTCB-1DE",
-				"amount": "58025"
+				"amount": "0"
 			},
 			{
 				"asset": "ETH.HEGIC-0X584BC13C7D411C00C01A62E8019472DE68768430",
@@ -1463,7 +1249,7 @@
 			},
 			{
 				"asset": "DOGE.DOGE",
-				"amount": "6011064701"
+				"amount": "0"
 			},
 			{
 				"asset": "ETH.WBTC-0X2260FAC5E5542A773AA44FBCFEDF7C193BC2C599",
@@ -1500,7 +1286,7 @@
 			"TERRA"
 		],
 		"inbound_tx_count": 1528,
-		"outbound_tx_count": 15002,
+		"outbound_tx_count": 15008,
 		"routers": [
 			{
 				"chain": "ETH",
@@ -1511,9 +1297,9 @@
 				"router": "0x8F66c4AE756BEbC49Ec8B81966DD8bba9f127549"
 			}
 		],
-		"status": "Active",
-		"bond": "95606860885378",
-		"total_value": "5932745880",
+		"status": "Standby",
+		"bond": "95774823337589",
+		"total_value": "14975313",
 		"addresses": [
 			{
 				"chain": "BCH",
@@ -1662,8 +1448,8 @@
 			}
 		],
 		"status": "Active",
-		"bond": "95650769775255",
-		"total_value": "3209081030",
+		"bond": "95816764842548",
+		"total_value": "2932451851",
 		"addresses": [
 			{
 				"chain": "BCH",
@@ -1812,8 +1598,8 @@
 			}
 		],
 		"status": "Active",
-		"bond": "95093179349153",
-		"total_value": "2661086878",
+		"bond": "95260973835015",
+		"total_value": "2604533655",
 		"addresses": [
 			{
 				"chain": "BCH",
@@ -1962,8 +1748,8 @@
 			}
 		],
 		"status": "Active",
-		"bond": "94241578724947",
-		"total_value": "6420630558",
+		"bond": "94409028949252",
+		"total_value": "6090345217",
 		"addresses": [
 			{
 				"chain": "BCH",
@@ -2112,8 +1898,8 @@
 			}
 		],
 		"status": "Active",
-		"bond": "95962136555339",
-		"total_value": "6610454880",
+		"bond": "96129663969962",
+		"total_value": "6252823028",
 		"addresses": [
 			{
 				"chain": "BCH",
@@ -2270,8 +2056,8 @@
 			}
 		],
 		"status": "Active",
-		"bond": "77964007463422",
-		"total_value": "118683069",
+		"bond": "78108213046817",
+		"total_value": "111317696",
 		"addresses": [
 			{
 				"chain": "BCH",
@@ -2424,8 +2210,8 @@
 			}
 		],
 		"status": "Active",
-		"bond": "91018197430495",
-		"total_value": "124485452",
+		"bond": "91186136523899",
+		"total_value": "116759988",
 		"addresses": [
 			{
 				"chain": "BCH",
@@ -2574,8 +2360,8 @@
 			}
 		],
 		"status": "Active",
-		"bond": "95102128430593",
-		"total_value": "4279085018",
+		"bond": "95269488223787",
+		"total_value": "4043640499",
 		"addresses": [
 			{
 				"chain": "BCH",
@@ -2721,7 +2507,7 @@
 		],
 		"status": "Standby",
 		"bond": "283003350",
-		"total_value": "679359139",
+		"total_value": "637198673",
 		"addresses": [
 			{
 				"chain": "BCH",
@@ -2759,7 +2545,7 @@
 			},
 			{
 				"asset": "BCH.BCH",
-				"amount": "37749141"
+				"amount": "2015566"
 			},
 			{
 				"asset": "BTC.BTC",
@@ -2906,7 +2692,7 @@
 			"TERRA"
 		],
 		"inbound_tx_count": 190,
-		"outbound_tx_count": 1479,
+		"outbound_tx_count": 1480,
 		"routers": [
 			{
 				"chain": "ETH",
@@ -2918,8 +2704,8 @@
 			}
 		],
 		"status": "Active",
-		"bond": "76581337309437",
-		"total_value": "5172150023",
+		"bond": "76722578509748",
+		"total_value": "1997986740",
 		"addresses": [
 			{
 				"chain": "BCH",
@@ -3072,8 +2858,8 @@
 			}
 		],
 		"status": "Standby",
-		"bond": "53279458091898",
-		"total_value": "32007038",
+		"bond": "53323911552498",
+		"total_value": "30020707",
 		"addresses": [
 			{
 				"chain": "BCH",
@@ -3243,7 +3029,7 @@
 		],
 		"status": "Standby",
 		"bond": "9081624",
-		"total_value": "9222331",
+		"total_value": "8650000",
 		"addresses": [
 			{
 				"chain": "BCH",
@@ -3384,8 +3170,8 @@
 			}
 		],
 		"status": "Active",
-		"bond": "95480292373583",
-		"total_value": "4501124890",
+		"bond": "95647729125802",
+		"total_value": "4410650022",
 		"addresses": [
 			{
 				"chain": "BCH",
@@ -3418,216 +3204,6 @@
 			{
 				"chain": "THOR",
 				"address": "thor17x539jfnlxm3hjcpd7cn29t3nyn3uv4myf5n5p"
-			}
-		]
-	},
-	{
-		"block_height": 3458010,
-		"pub_key": "thorpub1addwnpepqgj5kafsy9ylnsghvzvsqftrx4k6qgn7alfve4d7ndq77r34q6krvhznaqe",
-		"coins": [
-			{
-				"asset": "LTC.LTC",
-				"amount": "3579858"
-			},
-			{
-				"asset": "BCH.BCH",
-				"amount": "3909144"
-			},
-			{
-				"asset": "BTC.BTC",
-				"amount": "13939"
-			},
-			{
-				"asset": "BNB.ETH-1C9",
-				"amount": "841127"
-			},
-			{
-				"asset": "BNB.AVA-645",
-				"amount": "0"
-			},
-			{
-				"asset": "BNB.TWT-8C2",
-				"amount": "667956241"
-			},
-			{
-				"asset": "BNB.BTCB-1DE",
-				"amount": "15712"
-			},
-			{
-				"asset": "BNB.BUSD-BD1",
-				"amount": "5374522"
-			},
-			{
-				"asset": "BNB.BNB",
-				"amount": "166766"
-			},
-			{
-				"asset": "ETH.XRUNE-0X69FA0FEE221AD11012BAB0FDB45D444D3D2CE71C",
-				"amount": "0"
-			},
-			{
-				"asset": "ETH.USDT-0XDAC17F958D2EE523A2206206994597C13D831EC7",
-				"amount": "0",
-				"decimals": 6
-			},
-			{
-				"asset": "ETH.USDC-0XA0B86991C6218B36C1D19D4A2E9EB0CE3606EB48",
-				"amount": "0",
-				"decimals": 6
-			},
-			{
-				"asset": "ETH.PERP-0XBC396689893D065F41BC2C6ECBEE5E0085233447",
-				"amount": "0"
-			},
-			{
-				"asset": "ETH.AAVE-0X7FC66500C84A76AD7E9C93437BFC5AC33E2DDAE9",
-				"amount": "0"
-			},
-			{
-				"asset": "ETH.HOT-0X6C6EE5E31D828DE241282B9606C8E98EA48526E2",
-				"amount": "0"
-			},
-			{
-				"asset": "ETH.ALCX-0XDBDB4D16EDA451D0503B854CF79D55697F90C8DF",
-				"amount": "0"
-			},
-			{
-				"asset": "ETH.FOX-0XC770EEFAD204B5180DF6A14EE197D99D808EE52D",
-				"amount": "0"
-			},
-			{
-				"asset": "ETH.SNX-0XC011A73EE8576FB46F5E1C5751CA3B9FE0AF2A6F",
-				"amount": "0"
-			},
-			{
-				"asset": "ETH.KYL-0X67B6D479C7BB412C54E03DCA8E1BC6740CE6B99C",
-				"amount": "0"
-			},
-			{
-				"asset": "ETH.RAZE-0X5EAA69B29F99C84FE5DE8200340B4E9B4AB38EAC",
-				"amount": "0"
-			},
-			{
-				"asset": "ETH.YFI-0X0BC529C00C6401AEF6D220BE8C6EA1667F6AD93E",
-				"amount": "0"
-			},
-			{
-				"asset": "ETH.ETH",
-				"amount": "212753"
-			},
-			{
-				"asset": "ETH.ALPHA-0XA1FAA113CBE53436DF28FF0AEE54275C13B40975",
-				"amount": "0"
-			},
-			{
-				"asset": "ETH.THOR-0XA5F2211B9B8170F694421F2046281775E8468044",
-				"amount": "0"
-			},
-			{
-				"asset": "ETH.CREAM-0X2BA592F78DB6436527729929AAF6C908497CB200",
-				"amount": "0"
-			},
-			{
-				"asset": "ETH.SUSHI-0X6B3595068778DD592E39A122F4F5A5CF09C90FE2",
-				"amount": "0"
-			},
-			{
-				"asset": "ETH.HEGIC-0X584BC13C7D411C00C01A62E8019472DE68768430",
-				"amount": "0"
-			},
-			{
-				"asset": "ETH.TGT-0X108A850856DB3F85D0269A2693D896B394C80325",
-				"amount": "0"
-			},
-			{
-				"asset": "DOGE.DOGE",
-				"amount": "6027208396"
-			},
-			{
-				"asset": "ETH.WBTC-0X2260FAC5E5542A773AA44FBCFEDF7C193BC2C599",
-				"amount": "0"
-			},
-			{
-				"asset": "ETH.XDEFI-0X72B886D09C117654AB7DA13A14D603001DE0B777",
-				"amount": "0"
-			},
-			{
-				"asset": "TERRA.LUNA",
-				"amount": "0",
-				"decimals": 6
-			},
-			{
-				"asset": "TERRA.UST",
-				"amount": "0",
-				"decimals": 6
-			},
-			{
-				"asset": "ETH.DAI-0X6B175474E89094C44DA98B954EEDEAC495271D0F",
-				"amount": "0"
-			}
-		],
-		"type": "YggdrasilVault",
-		"status_since": 3458010,
-		"membership": [
-			"thorpub1addwnpepqgj5kafsy9ylnsghvzvsqftrx4k6qgn7alfve4d7ndq77r34q6krvhznaqe"
-		],
-		"chains": [
-			"BCH",
-			"BNB",
-			"BTC",
-			"ETH",
-			"LTC",
-			"THOR",
-			"DOGE",
-			"TERRA"
-		],
-		"inbound_tx_count": 247,
-		"outbound_tx_count": 2304,
-		"routers": [
-			{
-				"chain": "ETH",
-				"router": "0xD37BbE5744D730a1d98d8DC97c42F0Ca46aD7146"
-			},
-			{
-				"chain": "AVAX",
-				"router": "0x8F66c4AE756BEbC49Ec8B81966DD8bba9f127549"
-			}
-		],
-		"status": "Active",
-		"bond": "64935876768779",
-		"total_value": "3939548827",
-		"addresses": [
-			{
-				"chain": "BCH",
-				"address": "qq9c2jsrc44e6u636rk90npnu9p6ft6h7y9l45lhhu"
-			},
-			{
-				"chain": "BNB",
-				"address": "bnb1pwz55q79dwwhx5wsa3tucvlpgwj274l35qfvcd"
-			},
-			{
-				"chain": "BTC",
-				"address": "bc1qpwz55q79dwwhx5wsa3tucvlpgwj274l3q7gtaw"
-			},
-			{
-				"chain": "ETH",
-				"address": "0xcb4e61d96c868b7b9fc65914a8d63ad7e5ce353d"
-			},
-			{
-				"chain": "LTC",
-				"address": "ltc1qpwz55q79dwwhx5wsa3tucvlpgwj274l3yzj097"
-			},
-			{
-				"chain": "THOR",
-				"address": "thor1pwz55q79dwwhx5wsa3tucvlpgwj274l3sr0mvu"
-			},
-			{
-				"chain": "DOGE",
-				"address": "D6C1eTaJcLfWj3htsRgRWrqEre6iJkYuh3"
-			},
-			{
-				"chain": "TERRA",
-				"address": "terra1pwz55q79dwwhx5wsa3tucvlpgwj274l3sqvqmr"
 			}
 		]
 	},
@@ -3744,8 +3320,8 @@
 			}
 		],
 		"status": "Active",
-		"bond": "89657721695635",
-		"total_value": "118682001",
+		"bond": "89823644961885",
+		"total_value": "111316695",
 		"addresses": [
 			{
 				"chain": "BCH",
@@ -3800,19 +3376,19 @@
 			},
 			{
 				"asset": "BCH.BCH",
-				"amount": "15102368"
+				"amount": "0"
 			},
 			{
 				"asset": "BTC.BTC",
-				"amount": "15601"
+				"amount": "0"
 			},
 			{
 				"asset": "DOGE.DOGE",
-				"amount": "7195807920"
+				"amount": "0"
 			},
 			{
 				"asset": "LTC.LTC",
-				"amount": "2916629"
+				"amount": "0"
 			},
 			{
 				"asset": "ETH.THOR-0XA5F2211B9B8170F694421F2046281775E8468044",
@@ -3829,19 +3405,19 @@
 			},
 			{
 				"asset": "BNB.BNB",
-				"amount": "102847"
+				"amount": "0"
 			},
 			{
 				"asset": "BNB.BTCB-1DE",
-				"amount": "54678"
+				"amount": "0"
 			},
 			{
 				"asset": "BNB.BUSD-BD1",
-				"amount": "60090311"
+				"amount": "0"
 			},
 			{
 				"asset": "BNB.ETH-1C9",
-				"amount": "3986"
+				"amount": "0"
 			},
 			{
 				"asset": "ETH.XDEFI-0X72B886D09C117654AB7DA13A14D603001DE0B777",
@@ -3859,7 +3435,7 @@
 			},
 			{
 				"asset": "BNB.TWT-8C2",
-				"amount": "1079542692"
+				"amount": "0"
 			},
 			{
 				"asset": "ETH.YFI-0X0BC529C00C6401AEF6D220BE8C6EA1667F6AD93E",
@@ -3886,7 +3462,7 @@
 			"TERRA"
 		],
 		"inbound_tx_count": 132,
-		"outbound_tx_count": 1215,
+		"outbound_tx_count": 1220,
 		"routers": [
 			{
 				"chain": "ETH",
@@ -3898,8 +3474,8 @@
 			}
 		],
 		"status": "Active",
-		"bond": "76141933758438",
-		"total_value": "5441547709",
+		"bond": "76218981165118",
+		"total_value": "121196116",
 		"addresses": [
 			{
 				"chain": "BCH",
@@ -4104,8 +3680,8 @@
 			}
 		],
 		"status": "Active",
-		"bond": "95462240329722",
-		"total_value": "6646379245",
+		"bond": "95630144390117",
+		"total_value": "6276776613",
 		"addresses": [
 			{
 				"chain": "BCH",
@@ -4147,7 +3723,7 @@
 		"coins": [
 			{
 				"asset": "DOGE.DOGE",
-				"amount": "8501557114"
+				"amount": "7359337764"
 			},
 			{
 				"asset": "BCH.BCH",
@@ -4242,7 +3818,7 @@
 			"THOR"
 		],
 		"inbound_tx_count": 260,
-		"outbound_tx_count": 2506,
+		"outbound_tx_count": 2507,
 		"routers": [
 			{
 				"chain": "ETH",
@@ -4254,8 +3830,8 @@
 			}
 		],
 		"status": "Active",
-		"bond": "89557017221328",
-		"total_value": "6158906651",
+		"bond": "89721634565354",
+		"total_value": "5678085664",
 		"addresses": [
 			{
 				"chain": "BCH",
@@ -4404,8 +3980,8 @@
 			}
 		],
 		"status": "Active",
-		"bond": "95065961352495",
-		"total_value": "3501705159",
+		"bond": "95233870760601",
+		"total_value": "3458483871",
 		"addresses": [
 			{
 				"chain": "BCH",
@@ -4455,7 +4031,7 @@
 			},
 			{
 				"asset": "BNB.TWT-8C2",
-				"amount": "1313057693"
+				"amount": "594056707"
 			},
 			{
 				"asset": "TERRA.UST",
@@ -4484,7 +4060,7 @@
 			},
 			{
 				"asset": "BNB.BNB",
-				"amount": "166442"
+				"amount": "151442"
 			},
 			{
 				"asset": "ETH.XRUNE-0X69FA0FEE221AD11012BAB0FDB45D444D3D2CE71C",
@@ -4542,7 +4118,7 @@
 			"THOR"
 		],
 		"inbound_tx_count": 954,
-		"outbound_tx_count": 9357,
+		"outbound_tx_count": 9359,
 		"routers": [
 			{
 				"chain": "ETH",
@@ -4554,8 +4130,8 @@
 			}
 		],
 		"status": "Active",
-		"bond": "95156813257066",
-		"total_value": "6996325458",
+		"bond": "95324653208377",
+		"total_value": "5236047501",
 		"addresses": [
 			{
 				"chain": "BCH",
@@ -4708,8 +4284,8 @@
 			}
 		],
 		"status": "Active",
-		"bond": "75860024333062",
-		"total_value": "9018457",
+		"bond": "76000504206390",
+		"total_value": "8458779",
 		"addresses": [
 			{
 				"chain": "BCH",
@@ -4862,8 +4438,8 @@
 			}
 		],
 		"status": "Active",
-		"bond": "76440518112827",
-		"total_value": "129206559",
+		"bond": "76582038008443",
+		"total_value": "121188107",
 		"addresses": [
 			{
 				"chain": "BCH",
@@ -5012,8 +4588,8 @@
 			}
 		],
 		"status": "Active",
-		"bond": "95167877200331",
-		"total_value": "2512586824",
+		"bond": "95335748002630",
+		"total_value": "2344348297",
 		"addresses": [
 			{
 				"chain": "BCH",
@@ -5162,8 +4738,8 @@
 			}
 		],
 		"status": "Active",
-		"bond": "78189701379693",
-		"total_value": "3078199988",
+		"bond": "78334533090290",
+		"total_value": "2702223871",
 		"addresses": [
 			{
 				"chain": "BCH",
@@ -5316,8 +4892,8 @@
 			}
 		],
 		"status": "Active",
-		"bond": "95606292847572",
-		"total_value": "719886251",
+		"bond": "95773598451765",
+		"total_value": "696760805",
 		"addresses": [
 			{
 				"chain": "BCH",
@@ -5466,8 +5042,8 @@
 			}
 		],
 		"status": "Active",
-		"bond": "89305033557261",
-		"total_value": "3862615191",
+		"bond": "89470314123363",
+		"total_value": "3770052361",
 		"addresses": [
 			{
 				"chain": "BCH",
@@ -5620,8 +5196,8 @@
 			}
 		],
 		"status": "Active",
-		"bond": "89351335309157",
-		"total_value": "118694810",
+		"bond": "89516687641195",
+		"total_value": "111328709",
 		"addresses": [
 			{
 				"chain": "BCH",
@@ -5769,9 +5345,9 @@
 				"router": "0x8F66c4AE756BEbC49Ec8B81966DD8bba9f127549"
 			}
 		],
-		"status": "Standby",
-		"bond": "64757001653416",
-		"total_value": "115370929",
+		"status": "Active",
+		"bond": "64810974957740",
+		"total_value": "108211104",
 		"addresses": [
 			{
 				"chain": "BCH",
@@ -5838,7 +5414,7 @@
 			},
 			{
 				"asset": "BNB.BNB",
-				"amount": "27499"
+				"amount": "19999"
 			},
 			{
 				"asset": "BNB.BUSD-BD1",
@@ -5885,7 +5461,7 @@
 			},
 			{
 				"asset": "BNB.TWT-8C2",
-				"amount": "1378139294"
+				"amount": "1203329774"
 			},
 			{
 				"asset": "ETH.YFI-0X0BC529C00C6401AEF6D220BE8C6EA1667F6AD93E",
@@ -5912,7 +5488,7 @@
 			"TERRA"
 		],
 		"inbound_tx_count": 241,
-		"outbound_tx_count": 2087,
+		"outbound_tx_count": 2088,
 		"routers": [
 			{
 				"chain": "ETH",
@@ -5923,9 +5499,9 @@
 				"router": "0x8F66c4AE756BEbC49Ec8B81966DD8bba9f127549"
 			}
 		],
-		"status": "Standby",
-		"bond": "91296981497556",
-		"total_value": "4309075417",
+		"status": "Active",
+		"bond": "91372760530318",
+		"total_value": "3512072184",
 		"addresses": [
 			{
 				"chain": "BCH",
@@ -6078,8 +5654,8 @@
 			}
 		],
 		"status": "Active",
-		"bond": "94833073983847",
-		"total_value": "6537821",
+		"bond": "95001011628829",
+		"total_value": "6132089",
 		"addresses": [
 			{
 				"chain": "BCH",
@@ -6228,8 +5804,8 @@
 			}
 		],
 		"status": "Active",
-		"bond": "90099297486822",
-		"total_value": "3865770999",
+		"bond": "90265356079771",
+		"total_value": "3382481251",
 		"addresses": [
 			{
 				"chain": "BCH",
@@ -6378,8 +5954,8 @@
 			}
 		],
 		"status": "Active",
-		"bond": "89696674163491",
-		"total_value": "118132291",
+		"bond": "89862683144310",
+		"total_value": "110801099",
 		"addresses": [
 			{
 				"chain": "BCH",
@@ -6528,8 +6104,8 @@
 			}
 		],
 		"status": "Active",
-		"bond": "95526549676064",
-		"total_value": "4477993464",
+		"bond": "95693920928775",
+		"total_value": "4244634517",
 		"addresses": [
 			{
 				"chain": "BCH",

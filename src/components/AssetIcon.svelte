@@ -121,9 +121,9 @@
 
 	let hasError = false;
 
-	const onImgError = (e) => {
+	const onImgError = (e: Event) => {
 		hasError = true;
-		e.target.src = IconUnknown;
+		(e.target as HTMLImageElement).src = IconUnknown;
 	};
 </script>
 

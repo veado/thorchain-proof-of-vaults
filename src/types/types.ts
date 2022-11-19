@@ -56,5 +56,6 @@ export type PoolsData = {
 	status: PoolStatus;
 	priceUSD: BigNumber;
 	runeDepth: BigNumber;
+	decimal: number;
 };
 export type PoolsDataMap = Map<string /* asset as string */, PoolsData>;

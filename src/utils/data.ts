@@ -1,4 +1,5 @@
 import { getAddress as ethGetAddr } from '@ethersproject/address';
+import BigNumber from 'bignumber.js';
 
 import type {
 	Node,
@@ -17,8 +18,8 @@ import {
 	bnOrZero,
 	baseToAsset,
 	type AssetAmount,
-	assetAmount,
-	eqAsset
+	eqAsset,
+	bn
 } from '@xchainjs/xchain-util';
 import * as FP from 'fp-ts/lib/function';
 import * as A from 'fp-ts/lib/Array';
@@ -38,8 +39,34 @@ import type {
 } from 'src/types/types';
 import { THORNODE_DECIMAL } from '../stores/const';
 import type { PoolDetail, PoolDetails } from '@xchainjs/xchain-midgard';
-import { monoidAssetAmount, monoidBaseAmount, sequenceSOption } from './fp';
+import {
+	monoidAssetAmount,
+	monoidBaseAmount,
+	ordVaultDataByTypeStatusReverse,
+	sequenceSOption
+} from './fp';
 import { derived, type Readable, type Writable } from 'svelte/store';
+
+/**
+ * Helper to convert decimals
+ * e.g.
+ * ETH.ETH: 1e8 -> 1e18
+ * ETH.USDT: 1e8 -> 1e6
+ * COPIED from ASGARDEX
+ * @see https://github.com/thorchain/asgardex-electron/blob/681b5f1231b43b63f8861a775d139ca6826b02b8/src/renderer/helpers/assetHelper.ts#L293
+ */
+export const convertBaseAmountDecimal = (amount: BaseAmount, decimal: number): BaseAmount => {
+	const decimalDiff = decimal - amount.decimal;
+
+	const amountBN =
+		decimalDiff < 0
+			? amount
+					.amount()
+					.dividedBy(bn(10 ** (decimalDiff * -1)))
+					.decimalPlaces(0, BigNumber.ROUND_DOWN)
+			: amount.amount().multipliedBy(bn(10 ** decimalDiff));
+	return baseAmount(amountBN, decimal);
+};
 
 /** Helper to convert Writable -> Readable */
 export const toReadable = <T>(v$$: Writable<T>): Readable<T> => derived(v$$, FP.identity);
@@ -75,13 +102,17 @@ export const getPoolsData = (pools: PoolDetails): PoolsDataMap =>
 				O.fromNullable,
 				O.fold(
 					() => acc,
-					(asset) =>
-						acc.set(cur.asset, {
+					(asset) => {
+						const decimalInt = Number.parseInt(cur.nativeDecimal);
+						const decimal = !isNaN(decimalInt) || decimalInt > -1 ? decimalInt : THORNODE_DECIMAL;
+						return acc.set(cur.asset, {
 							asset,
 							status: (cur.status || 'unknown') as PoolStatus,
-							priceUSD: bnOrZero(cur.assetPrice),
-							runeDepth: bnOrZero(cur.runeDepth)
-						})
+							priceUSD: bnOrZero(cur.assetPriceUSD),
+							runeDepth: bnOrZero(cur.runeDepth),
+							decimal
+						});
+					}
 				)
 			)
 		)
@@ -113,7 +144,17 @@ export const getPrice = ({
 	FP.pipe(
 		poolsData.get(assetToString(asset)),
 		O.fromNullable,
-		O.map(({ priceUSD: price }) => baseToAsset(amount).times(assetAmount(price, THORNODE_DECIMAL)))
+		O.map(({ priceUSD: price }) =>
+			baseToAsset(baseAmount(amount.amount().times(price), amount.decimal))
+		)
+	);
+
+export const getDecimal = (asset: Asset, poolsData: PoolsDataMap): number =>
+	FP.pipe(
+		poolsData.get(assetToString(asset)),
+		O.fromNullable,
+		O.map(({ decimal }) => decimal),
+		O.getOrElse(() => THORNODE_DECIMAL)
 	);
 
 export const getPoolStatus = (asset: Asset, poolsData: PoolsDataMap): PoolStatus =>
@@ -147,12 +188,17 @@ const toVaultData = ({
 				assetFromString(coin.asset),
 				O.fromNullable,
 				O.map<Asset, VaultData>((asset: Asset) => {
-					const amount = baseAmount(coin.amount, coin?.decimals ?? THORNODE_DECIMAL);
+					const amount =
+						// coin.amount is 1e8 by default, but it needs to be converted to whatever the original decimal is
+						convertBaseAmountDecimal(
+							baseAmount(coin.amount, THORNODE_DECIMAL),
+							getDecimal(asset, poolsData)
+						);
 
 					return {
 						asset,
 						address: getAddress(vault.addresses, asset.chain),
-						amount: baseAmount(coin.amount, coin?.decimals ?? THORNODE_DECIMAL),
+						amount,
 						amountUSD: getPrice({ asset, amount, poolsData }),
 						type: vault.type ? toVaultType(vault.type) : 'unknown',
 						status: (vault?.status ?? 'unknown') as VaultStatus
@@ -197,6 +243,11 @@ export const toVaultList = ({
 			...v,
 			total: sumAmounts(v.data),
 			totalUSD: O.some(sumUSDAmounts(v.data))
+		})),
+		// sort data
+		A.map<VaultListData, VaultListData>((v) => ({
+			...v,
+			data: FP.pipe(v.data, A.sort(ordVaultDataByTypeStatusReverse))
 		}))
 	);
 
@@ -256,7 +307,7 @@ export const sumUSDAmounts = (amounts: Array<Pick<VaultData, 'amountUSD'>>): Ass
 
 export const trimAddress = (addr: Address) => {
 	const l = addr.length;
-	return l <= 8 ? addr : `${addr.substring(0, 4)}...${addr.substring(l - 4)}`;
+	return l <= 10 ? addr : `${addr.substring(0, 6)}...${addr.substring(l - 4)}`;
 };
 
 export const getEthTokenAddress = (asset: Asset): Address =>
