@@ -1,0 +1,21 @@
+{
+	"addLiquidityCount": "135977",
+	"addLiquidityVolume": "18998120431570580",
+	"dailyActiveUsers": "0",
+	"impermanentLossProtectionPaid": "323409736615284",
+	"monthlyActiveUsers": "0",
+	"runeDepth": "3495891442786524",
+	"runePriceUSD": "1.2075946239928061",
+	"swapCount": "7399198",
+	"swapCount24h": "14612",
+	"swapCount30d": "1303969",
+	"swapVolume": "383206754400008063",
+	"switchedRune": "48565250602099463",
+	"synthBurnCount": "1878111",
+	"synthMintCount": "2138176",
+	"toAssetCount": "1596961",
+	"toRuneCount": "1785950",
+	"uniqueSwapperCount": "0",
+	"withdrawCount": "109719",
+	"withdrawVolume": "17941127273542039"
+}
