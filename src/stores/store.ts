@@ -10,14 +10,21 @@ import { MAX_REALOAD_COUNTER, THORNODE_URL } from './const';
 import { derived, get, writable, type Readable, type Writable } from 'svelte/store';
 import * as E from 'fp-ts/lib/Either';
 import * as RD from '@devexperts/remote-data-ts';
+import * as A from 'fp-ts/lib/Array';
 
 import * as TE from 'fp-ts/lib/TaskEither';
 import { MIDGARD_URL } from './const';
 
 import type { PoolDetails, StatsData } from '@xchainjs/xchain-midgard';
 import { Configuration as MidgardConfig, DefaultApi } from '@xchainjs/xchain-midgard';
-import { sequenceSTaskEither } from '../utils/fp';
-import type { DataAD, PoolsDataMap, VaultList } from '../types/types';
+import {
+	ordVaultByName,
+	ordVaultByNameReverse,
+	ordVaultByUSDAmount,
+	ordVaultByUSDAmountReverse,
+	sequenceSTaskEither
+} from '../utils/fp';
+import type { DataAD, PoolsDataMap, VaultList, VaultListData } from '../types/types';
 import {
 	getPoolsData,
 	toNodesVaultDataMap,
@@ -25,6 +32,7 @@ import {
 	toVaultList,
 	toReadable
 } from '../utils/data';
+import type * as Ord from 'fp-ts/lib/Ord';
 import { assetAmount } from '@xchainjs/xchain-util';
 
 const midgardConfig = new MidgardConfig({ basePath: MIDGARD_URL });
@@ -47,6 +55,22 @@ export const vaults$: Readable<VaultList> = derived(dataRD$, (dataRD) =>
 		}),
 		RD.getOrElse(() => get(_vaults))
 	)
+);
+
+type VaultSort = 'usd' | 'usdRev' | 'name' | 'nameRev';
+
+const vaultSortMap: Record<VaultSort, Ord.Ord<VaultListData>> = {
+	usd: ordVaultByUSDAmount,
+	usdRev: ordVaultByUSDAmountReverse,
+	name: ordVaultByName,
+	nameRev: ordVaultByNameReverse
+};
+
+export const vaultSort$$ = writable<VaultSort>('usd');
+
+export const vaultsSorted$: Readable<VaultList> = derived(
+	[vaultSort$$, vaults$],
+	([vaultSort, vaults]) => FP.pipe(vaults, A.sort(vaultSortMap[vaultSort]))
 );
 
 const _pools = writable<PoolsDataMap>(new Map());
@@ -79,7 +103,6 @@ const counter$: Readable<number> = derived(
 			intervalId = setInterval(() => {
 				_counter++;
 				set(_counter);
-				console.log('setInterval:', _counter);
 			}, 1000);
 		} else {
 			reset();
@@ -90,7 +113,6 @@ const counter$: Readable<number> = derived(
 );
 
 counter$.subscribe((value) => {
-	console.log('sub counter:', value);
 	if (value >= MAX_REALOAD_COUNTER) {
 		loadAllData();
 	}
@@ -168,22 +190,22 @@ export const loadAllData = async () =>
 	FP.pipe(
 		// pending
 		dataRD$$.set(RD.pending),
-		() =>
-			sequenceSTaskEither({
-				asgards: loadAsgards(),
-				yggs: loadYggs(),
-				pools: loadPools(),
-				nodes: loadNodes(),
-				stats: loadStats()
-			}),
 		// () =>
 		// 	sequenceSTaskEither({
-		// 		asgards: loadAsgardsJSON('churn-8231550'),
-		// 		yggs: loadYggsJSON('churn-8231550'),
-		// 		pools: loadPoolsJSON('churn-8231550'),
-		// 		nodes: loadNodesJSON('churn-8231550'),
-		// 		stats: loadStatsJSON('churn-8231550')
+		// 		asgards: loadAsgards(),
+		// 		yggs: loadYggs(),
+		// 		pools: loadPools(),
+		// 		nodes: loadNodes(),
+		// 		stats: loadStats()
 		// 	}),
+		() =>
+			sequenceSTaskEither({
+				asgards: loadAsgardsJSON('8295828'),
+				yggs: loadYggsJSON('8295828'),
+				pools: loadPoolsJSON('8295828'),
+				nodes: loadNodesJSON('8295828'),
+				stats: loadStatsJSON('8295828')
+			}),
 		(seq) =>
 			seq().then(
 				E.fold(
