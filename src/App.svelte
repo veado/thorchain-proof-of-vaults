@@ -8,7 +8,8 @@
 		formatAssetAmountCurrency,
 		baseToAsset,
 		assetFromString,
-		assetAmount
+		assetAmount,
+		assetToString
 	} from '@xchainjs/xchain-util';
 
 	import {
@@ -77,24 +78,24 @@
 	onMount(loadAllData);
 </script>
 
-<main class={`flex flex-col bg-gray-100 p-10 md:p-20 ${emptyData ? 'h-screen' : ''}`}>
+<main class="flex flex-col bg-gray-100 p-10 md:p-20 {emptyData ? 'h-screen' : ''}">
 	<div
-		class={`container bg-white flex flex-col p-10 md:p-20 shadow-md ${
+		class={`container flex flex-col bg-white p-10 shadow-md md:p-20 ${
 			emptyData ? 'min-h-full' : ''
 		}`}
 	>
-		<div class="flex justify-center mb-5">
+		<div class="mb-5 flex justify-center">
 			<img
 				src={logo}
-				class="max-w-full rounded-full w-[50px] h-[50px] border-4 border-black"
+				class="h-[50px] w-[50px] max-w-full rounded-full border-4 border-black"
 				alt=""
 			/>
 		</div>
-		<h1 class="text-2xl text-center uppercase">Proof Of Vaults</h1>
-		<div class="flex flex-col justify-center items-center my-10">
+		<h1 class="text-center text-2xl uppercase">Proof Of Vaults</h1>
+		<div class="my-10 flex flex-col items-center justify-center">
 			<button
-				class={`flex items-center w-auto px-6 py-2 text-lg bg-gray-500 text-white rounded-full uppercase shadow-md
-         hover:bg-gray-600 hover:shadow-lg ${loading ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+				class="flex w-auto items-center rounded-full bg-gray-500 px-6 py-2 text-lg uppercase text-white shadow-md
+         hover:bg-gray-600 hover:shadow-lg {loading ? 'cursor-not-allowed' : 'cursor-pointer'}"
 				on:click={loadAllData}
 				disabled={loading}
 			>
@@ -112,30 +113,30 @@
 					on:change={() => autoReload$$.update((v) => !v)}
 				/>
 				<label
-					class={`text-sm ml-2 
+					class={`ml-2 text-sm 
           ${
 						loading
-							? 'text-gray-300 cursor-not-allowed'
-							: 'text-gray-400 cursor-pointer hover:text-gray-600 peer-checked:text-gray-500'
+							? 'cursor-not-allowed text-gray-300'
+							: 'cursor-pointer text-gray-400 hover:text-gray-600 peer-checked:text-gray-500'
 					} `}
 					for="autoreload"
 					>Auto reload ({new Date($timeLeft$ * 1000).toISOString().substring(14, 19)})</label
 				>
 			</div>
 		</div>
-		<div class="flex itmes-center py-4">
+		<div class="itmes-center flex py-4">
 			<select
-				class="form-select appearance-none
-          block
+				class="form-select block
           w-[200px]
-          px-3
-          py-1.5
-          text-base
-          font-normal
-          text-gray-500
-          bg-white bg-clip-padding bg-no-repeat
-          border border-solid border-gray-400 focus:border-gray-600 focus:ring-0
-          focus:outline-none"
+          appearance-none
+          border
+          border-solid
+          border-gray-400
+          bg-white
+          bg-clip-padding
+          bg-no-repeat px-3 py-1.5
+          text-base font-normal text-gray-500 focus:border-gray-600 focus:outline-none
+          focus:ring-0"
 				bind:value={$vaultSort$$}
 			>
 				<option value="usd">USD ↑</option>
@@ -144,29 +145,29 @@
 				<option value="nameRev">Asset ↓</option>
 			</select>
 		</div>
-		{#each $vaults$ as vs}
+		{#each $vaults$ as vs (assetToString(vs.asset))}
 			{@const asset = vs.asset}
 			{@const noAsgards = getNoVaults('asgard', vs.data)}
 			{@const noYggs = getNoVaults('ygg', vs.data)}
 			<!-- vaults wrapper -->
-			<div class="flex flex-col p-10 rounded-xl border border-gray-300 mb-20">
+			<div class="mb-20 flex flex-col rounded-xl border border-gray-300 p-10">
 				<!-- vault overview -->
-				<div class="flex flex-col justify-center items-center">
+				<div class="flex flex-col items-center justify-center">
 					<div class="flex items-center">
 						<AssetIcon
 							{asset}
-							class="w-[50px] h-[50px] lg:w-[60px] lg:h-[60px] xl:w-[70px] xl:h-[70px]"
+							class="h-[50px] w-[50px] lg:h-[60px] lg:w-[60px] xl:h-[70px] xl:w-[70px]"
 						/>
-						<div class="ml-1 lg:ml-3 xl:ml-5 pr-10 border-r border-gray-200">
-							<h1 class="text-xl lg:text-3xl xl:text-4xl text-gray-800 leading-none pb-1">
+						<div class="ml-1 border-r border-gray-200 pr-10 lg:ml-3 xl:ml-5">
+							<h1 class="pb-1 text-xl leading-none text-gray-800 lg:text-3xl xl:text-4xl">
 								{asset.ticker}
 							</h1>
-							<h2 class="text-lg lg:text-1xl xl:text-2xl text-gray-400 py-0 leading-none">
+							<h2 class="lg:text-1xl py-0 text-lg leading-none text-gray-400 xl:text-2xl">
 								{asset.chain}
 							</h2>
 						</div>
-						<div class="flex flex-col ml-10">
-							<h3 class="text-xl lg:text-3xl xl:text-4xl text-gray-600 py-0 leading-none">
+						<div class="ml-10 flex flex-col">
+							<h3 class="py-0 text-xl leading-none text-gray-600 lg:text-3xl xl:text-4xl">
 								{formatAssetAmountCurrency({
 									amount: baseToAsset(vs.total),
 									asset,
@@ -174,7 +175,7 @@
 									decimal: 6
 								})}
 							</h3>
-							<h3 class="text-lg lg:text-1xl xl:text-2xl text-gray-300 py-0 leading-none pt-1">
+							<h3 class="lg:text-1xl py-0 pt-1 text-lg leading-none text-gray-300 xl:text-2xl">
 								{FP.pipe(
 									vs.totalUSD,
 									O.chain(O.fromPredicate((totalUSD) => totalUSD.gt(assetAmount(0)))),
@@ -191,39 +192,39 @@
 							</h3>
 						</div>
 					</div>
-					<div class="flex justify-center my-4">
+					<div class="my-4 flex justify-center">
 						<LoaderIcon class={`text-gray-400 ${loading ? 'visible' : 'invisible'}`} />
 					</div>
 					<div class="flex items-center">
-						<div class={` text-gray-500 px-3 text-base xl:text-lg uppercase`}>
+						<div class={` px-3 text-base uppercase text-gray-500 xl:text-lg`}>
 							{noAsgards} Asgards
 						</div>
 						{#if noYggs > 0}
 							<div
-								class={`border-l border-gray-300 text-gray-500 px-3 text-base xl:text-lg uppercase`}
+								class={`border-l border-gray-300 px-3 text-base uppercase text-gray-500 xl:text-lg`}
 							>
 								{noYggs} Yggdrasils
 							</div>
 						{/if}
 						<div
-							class={`border-l border-gray-300 text-gray-500 px-3  text-base xl:text-lg uppercase`}
+							class={`border-l border-gray-300 px-3 text-base  uppercase text-gray-500 xl:text-lg`}
 						>
 							{labelPoolStatus(getPoolStatus(asset, $pools$))} pool
 						</div>
 					</div>
 				</div>
 				<!-- vault details -->
-				<div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3 xl:gap-6 mt-20">
-					{#each vs.data as v}
+				<div class="mt-20 grid grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-3 xl:gap-6">
+					{#each vs.data as v (v.asset)}
 						{@const addr = O.getOrElse(() => '')(v.address)}
-						<div class="flex flex-col items-center bg-gray-50 rounded-lg">
+						<div class="flex flex-col items-center rounded-lg bg-gray-50">
 							<div
-								class={`w-full text-center bg-gray-100 text-gray-500 text-xs uppercase py-3 px-2  rounded-t-lg`}
+								class={`w-full rounded-t-lg bg-gray-100 py-3 px-2 text-center text-xs uppercase  text-gray-500`}
 							>
 								{labelVaultType(v.type)}
 								<span class="lower-case">({labelVaultStatus(v.status)})</span>
 							</div>
-							<div class="text-xl text-gray-600 leading-none pt-4">
+							<div class="pt-4 text-xl leading-none text-gray-600">
 								{formatAssetAmountCurrency({
 									amount: baseToAsset(v.amount),
 									asset: v.asset,
@@ -231,7 +232,7 @@
 									trimZeros: true
 								})}
 							</div>
-							<div class="text-base text-gray-400 leading-none  pt-2">
+							<div class="pt-2 text-base leading-none  text-gray-400">
 								{FP.pipe(
 									sequenceSOption({
 										asset: O.fromNullable(assetFromString('BNB.BUSD')),
@@ -245,7 +246,7 @@
 							</div>
 							{#if !!addr}
 								<div
-									class="flex justify-center items-center text-base text-gray-600 pt-3 pb-4"
+									class="flex items-center justify-center pt-3 pb-4 text-base text-gray-600 "
 									title={addr}
 								>
 									<span class="">{trimAddress(addr)} </span><ExternalLinkIcon class="ml-1" />
