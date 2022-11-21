@@ -28,11 +28,14 @@ npm run dev
 
 ## Built with (in alphabetical order)
 
+- [heroicons](https://heroicons.com/) / [svelte-heroicons](https://github.com/krowten/svelte-heroicons)
 - [fp-ts](https://gcanti.github.io/fp-ts/)
 - [Svelte](https://svelte.dev)
 - [tailwindcss](https://tailwindcss.com)
+- [Tailwind Elements](https://github.com/mdbootstrap/Tailwind-Elements/)
 - [TypeScript](https://www.typescriptlang.org/)
 - [Vite](https://vitejs.dev/)
+- [xchain-util](https://github.com/xchainjs/xchainjs-lib/tree/master/packages/xchain-util)
 
 ## Licence
 
