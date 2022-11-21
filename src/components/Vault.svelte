@@ -9,6 +9,8 @@
 	import { trimAddress } from '../utils/data';
 
 	export let data: VaultData;
+	let className = '';
+	export { className as class };
 
 	const { type, asset, status, amount, amountUSD, address: oAddress } = data;
 	const addr = FP.pipe(
@@ -17,7 +19,7 @@
 	);
 </script>
 
-<div class="flex flex-col items-center rounded-lg bg-gray-50">
+<div class="flex flex-col items-center rounded-lg bg-gray-50 {className}">
 	<div
 		class={`w-full rounded-t-lg bg-gray-100 py-3 px-2 text-center text-xs uppercase  text-gray-500`}
 	>
@@ -46,7 +48,7 @@
 	</div>
 	{#if !!addr}
 		<div class="flex items-center justify-center pt-3 pb-4 text-base text-gray-600 " title={addr}>
-			<span class="">{trimAddress(addr)} </span><ExternalLinkIcon class="ml-1" />
+			<span class="">{trimAddress(addr)} </span><ExternalLinkIcon class="ml-1 h-4 w-4" />
 		</div>
 	{/if}
 </div>

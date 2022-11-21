@@ -60,4 +60,13 @@ export type PoolsData = {
 	runeDepth: BigNumber;
 	decimal: number;
 };
+
 export type PoolsDataMap = Map<string /* asset as string */, PoolsData>;
+
+/**
+ * Visible status of VaultDetails
+ * O.some('expanded') -> all vaults expand its details
+ * O.some('collapsed') -> all vaults collapse its details
+ * O.none -> misc. -> collapsed or expanded depending on user interactions
+ * */
+export type VaultDetailsStatus = O.Option<'collapsed' | 'expanded'>;
