@@ -25,6 +25,8 @@ export const monoidAssetAmount: Monoid<AssetAmount> = {
 	empty: assetAmount(0)
 };
 
+export const eqOptionString = O.getEq(S.Eq);
+
 const eqBigNumber: Eq.Eq<BigNumber> = {
 	equals: (x, y) => x.isEqualTo(y)
 };

@@ -17,10 +17,31 @@
 	import LoaderIcon from './components/LoaderIcon.svelte';
 	import VaultSortDropdown from './components/VaultSortDropdown.svelte';
 	import Vaults from './components/Vaults.svelte';
+	import type { VaultDetailsStatus } from './types/types';
+	import * as O from 'fp-ts/lib/Option';
+	import { eqOptionString } from './utils/fp';
 
 	$: loading = RD.isPending($dataRD$);
 
 	$: emptyData = $vaults$.length <= 0 || $pools$.size <= 0;
+
+	let vaultDetailsStatus: VaultDetailsStatus = O.some('collapsed');
+
+	const updateToggleStatus = () => {
+		/* for any user interaction just set to O.none */
+		vaultDetailsStatus = O.none;
+	};
+
+	const expandDetails = () => {
+		vaultDetailsStatus = O.some('expanded');
+	};
+
+	const collapseDetails = () => {
+		vaultDetailsStatus = O.some('collapsed');
+	};
+
+	$: vaultDetailsCollapsed = eqOptionString.equals(vaultDetailsStatus, O.some('collapsed'));
+	$: vaultDetailsExpanded = eqOptionString.equals(vaultDetailsStatus, O.some('expanded'));
 
 	// load all data at start
 	onMount(loadAllData);
@@ -82,13 +103,34 @@
 			</div>
 		</div>
 
-		<VaultSortDropdown
-			class="w-[200px] py-4"
-			current={$vaultSort$$}
-			on:item-selected={({ detail }) => vaultSort$$.set(detail)}
-		/>
+		<div class="flex items-center py-4">
+			<VaultSortDropdown
+				class="w-[200px]"
+				current={$vaultSort$$}
+				on:item-selected={({ detail }) => vaultSort$$.set(detail)}
+			/>
+			<button
+				class="ml-2 text-gray-400 underline hover:text-gray-500"
+				on:click={expandDetails}
+				disabled={vaultDetailsExpanded}
+			>
+				Expand All
+			</button>
+			<button
+				class="ml-2 text-gray-400 underline hover:text-gray-500"
+				on:click={collapseDetails}
+				disabled={vaultDetailsCollapsed}
+			>
+				Collapse All
+			</button>
+		</div>
 		{#each $vaults$ as vs (assetToString(vs.asset))}
-			<Vaults item={vs} {loading} />
+			<Vaults
+				item={vs}
+				{loading}
+				on:details-visible={updateToggleStatus}
+				bind:collapseStatus={vaultDetailsStatus}
+			/>
 		{/each}
 	</div>
 </main>

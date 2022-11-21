@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { VaultListData } from 'src/types/types';
+	import type { VaultDetailsStatus, VaultListData } from 'src/types/types';
 
 	import * as FP from 'fp-ts/lib/function';
 
@@ -14,9 +14,35 @@
 	import LoaderIcon from './LoaderIcon.svelte';
 	import { labelByPoolStatus } from '../utils/renderer';
 	import Vault from './Vault.svelte';
+	import { createEventDispatcher } from 'svelte';
+	import { ChevronDoubleDownIcon } from '@krowten/svelte-heroicons';
 
-	export let item: VaultListData;
+	export let item: VaultListData = undefined;
 	export let loading = false;
+	export let collapseStatus: VaultDetailsStatus = O.none;
+
+	let showDetails = false;
+	const dispatch = createEventDispatcher();
+
+	$: updateShowDetails(collapseStatus);
+
+	const updateShowDetails = (collapseStatus: VaultDetailsStatus) => {
+		FP.pipe(
+			collapseStatus,
+			O.map((status) => {
+				if (status === 'expanded') showDetails = true;
+				if (status === 'collapsed') showDetails = false;
+
+				return true;
+			})
+		);
+	};
+
+	const toggleDetails = () => {
+		showDetails = !showDetails;
+		console.log('toggleDetails:', showDetails);
+		dispatch('details-visible', showDetails);
+	};
 
 	const { asset, data, total, totalUSD } = item;
 
@@ -25,7 +51,9 @@
 </script>
 
 <!-- vaults wrapper -->
-<div class="mb-20 flex flex-col rounded-xl border border-gray-300 p-10">
+<div
+	class="mb-20 flex flex-col rounded-xl border border-gray-300 p-10 {!showDetails ? 'pb-0' : ''}"
+>
 	<!-- vault overview -->
 	<div class="flex flex-col items-center justify-center">
 		<div class="flex items-center">
@@ -84,10 +112,20 @@
 			</div>
 		</div>
 	</div>
-	<!-- vault details -->
-	<div class="mt-20 grid grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-3 xl:gap-6">
-		{#each data as v (v.asset)}
-			<Vault data={v} />
-		{/each}
+	<div class="flex justify-center py-5">
+		<button
+			class="rounded-full border border-gray-400 bg-white p-4 text-gray-400 hover:border-gray-500 hover:text-gray-500 hover:shadow-lg "
+			on:click={toggleDetails}
+		>
+			<ChevronDoubleDownIcon class="h-5 w-5 {showDetails ? 'rotate-180' : ''}" />
+		</button>
 	</div>
+	{#if showDetails}
+		<!-- vault details -->
+		<div class="grid grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-3 xl:gap-6">
+			{#each data as v (v.asset)}
+				<Vault data={v} />
+			{/each}
+		</div>
+	{/if}
 </div>
