@@ -33,6 +33,8 @@ export type VaultListData = {
 
 export type VaultList = VaultListData[];
 
+export type VaultSort = 'usd' | 'usdRev' | 'name' | 'nameRev';
+
 export type DataAD = RD.RemoteData<
 	Error,
 	{ vaults: VaultList; pools: PoolsDataMap; nodes: Node[] }

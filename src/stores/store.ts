@@ -24,7 +24,7 @@ import {
 	ordVaultByUSDAmountReverse,
 	sequenceSTaskEither
 } from '../utils/fp';
-import type { DataAD, PoolsDataMap, VaultList, VaultListData } from '../types/types';
+import type { DataAD, PoolsDataMap, VaultList, VaultListData, VaultSort } from '../types/types';
 import {
 	getPoolsData,
 	toNodesVaultDataMap,
@@ -57,9 +57,7 @@ export const vaults$: Readable<VaultList> = derived(dataRD$, (dataRD) =>
 	)
 );
 
-type VaultSort = 'usd' | 'usdRev' | 'name' | 'nameRev';
-
-const vaultSortMap: Record<VaultSort, Ord.Ord<VaultListData>> = {
+const VAULT_SORT_MAP: Record<VaultSort, Ord.Ord<VaultListData>> = {
 	usd: ordVaultByUSDAmount,
 	usdRev: ordVaultByUSDAmountReverse,
 	name: ordVaultByName,
@@ -70,7 +68,7 @@ export const vaultSort$$ = writable<VaultSort>('usd');
 
 export const vaultsSorted$: Readable<VaultList> = derived(
 	[vaultSort$$, vaults$],
-	([vaultSort, vaults]) => FP.pipe(vaults, A.sort(vaultSortMap[vaultSort]))
+	([vaultSort, vaults]) => FP.pipe(vaults, A.sort(VAULT_SORT_MAP[vaultSort]))
 );
 
 const _pools = writable<PoolsDataMap>(new Map());

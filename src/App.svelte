@@ -26,55 +26,16 @@
 	import { getNoVaults, getPoolStatus, trimAddress } from './utils/data';
 	import { sequenceSOption } from './utils/fp';
 	import ExternalLinkIcon from './components/IconExternalLink.svelte';
-	import type { PoolStatus, VaultStatus, VaultType } from './types/types';
 	import AssetIcon from './components/AssetIcon.svelte';
 	import LoaderIcon from './components/LoaderIcon.svelte';
-
-	const labelPoolStatus = (status: PoolStatus) => {
-		switch (status) {
-			case 'available':
-				return 'active';
-			case 'staged':
-				return 'pending';
-			case 'suspended':
-				return 'inactive';
-			case 'unknown':
-				return 'unknown';
-		}
-	};
-
-	const labelVaultStatus = (status: VaultStatus) => {
-		switch (status) {
-			case 'ActiveVault':
-			case 'Active':
-				return 'active';
-			case 'RetiringVault':
-				return 'retiring';
-			case 'Standby':
-				return 'standby';
-			case 'unknown':
-				return 'unkown';
-		}
-	};
-
-	const labelVaultType = (type: VaultType) => {
-		switch (type) {
-			case 'asgard':
-				return 'asgard';
-			case 'ygg':
-				return 'Yggdrasil';
-			case 'bond':
-				return 'bond';
-			case 'unknown':
-				return 'unknown';
-		}
-	};
+	import VaultSortDropdown from './components/VaultSortDropdown.svelte';
+	import { labelByPoolStatus, labelByVaultStatus, labelByVaultType } from './utils/renderer';
 
 	$: loading = RD.isPending($dataRD$);
 
 	$: emptyData = $vaults$.length <= 0 || $pools$.size <= 0;
 
-	// load all data on start
+	// load all data at start
 	onMount(loadAllData);
 </script>
 
@@ -94,7 +55,7 @@
 		<h1 class="text-center text-2xl uppercase">Proof Of Vaults</h1>
 		<div class="my-10 flex flex-col items-center justify-center">
 			<button
-				class="flex w-auto items-center rounded-full bg-gray-500 px-6 py-2 text-lg uppercase text-white shadow-md
+				class="flex w-auto items-center rounded-full bg-gray-500 px-6 py-2 text-lg uppercase text-white
          hover:bg-gray-600 hover:shadow-lg {loading ? 'cursor-not-allowed' : 'cursor-pointer'}"
 				on:click={loadAllData}
 				disabled={loading}
@@ -103,48 +64,42 @@
 				Reload data
 			</button>
 
-			<div class="flex items-center py-2">
+			<div class="form-check items-center py-2">
 				<input
 					id="autoreload"
 					type="checkbox"
-					class="peer h-4 w-4 border-gray-400 checked:border-none checked:text-gray-500 focus:ring-0"
+					class="peer
+          form-check-input 
+          float-left mt-1 mr-1 
+          h-4 w-4 
+          cursor-pointer 
+          appearance-none 
+          rounded-sm border border-gray-400 bg-white bg-contain bg-center bg-no-repeat 
+          align-top checked:border-none checked:bg-gray-500 focus:outline-none"
 					checked={$autoReload$$}
 					disabled={loading}
 					on:change={() => autoReload$$.update((v) => !v)}
 				/>
 				<label
-					class={`ml-2 text-sm 
-          ${
-						loading
-							? 'cursor-not-allowed text-gray-300'
-							: 'cursor-pointer text-gray-400 hover:text-gray-600 peer-checked:text-gray-500'
-					} `}
+					class="ml-2 text-sm 
+        {loading
+						? 'cursor-not-allowed text-gray-300'
+						: 'cursor-pointer text-gray-400 hover:text-gray-500'}
+            peer-checked:text-gray-500
+            "
 					for="autoreload"
-					>Auto reload ({new Date($timeLeft$ * 1000).toISOString().substring(14, 19)})</label
-				>
+					>Auto reload {$autoReload$$
+						? `(${new Date($timeLeft$ * 1000).toISOString().substring(14, 19)})`
+						: ''}
+				</label>
 			</div>
 		</div>
-		<div class="itmes-center flex py-4">
-			<select
-				class="form-select block
-          w-[200px]
-          appearance-none
-          border
-          border-solid
-          border-gray-400
-          bg-white
-          bg-clip-padding
-          bg-no-repeat px-3 py-1.5
-          text-base font-normal text-gray-500 focus:border-gray-600 focus:outline-none
-          focus:ring-0"
-				bind:value={$vaultSort$$}
-			>
-				<option value="usd">USD ↑</option>
-				<option value="usdRev">USD ↓</option>
-				<option value="name">Asset ↑</option>
-				<option value="nameRev">Asset ↓</option>
-			</select>
-		</div>
+
+		<VaultSortDropdown
+			class="w-[200px] py-4"
+			current={$vaultSort$$}
+			on:item-selected={({ detail }) => vaultSort$$.set(detail)}
+		/>
 		{#each $vaults$ as vs (assetToString(vs.asset))}
 			{@const asset = vs.asset}
 			{@const noAsgards = getNoVaults('asgard', vs.data)}
@@ -158,7 +113,7 @@
 							{asset}
 							class="h-[50px] w-[50px] lg:h-[60px] lg:w-[60px] xl:h-[70px] xl:w-[70px]"
 						/>
-						<div class="ml-1 border-r border-gray-200 pr-10 lg:ml-3 xl:ml-5">
+						<div class="ml-1 border-r border-gray-400 pr-10 lg:ml-3 xl:ml-5">
 							<h1 class="pb-1 text-xl leading-none text-gray-800 lg:text-3xl xl:text-4xl">
 								{asset.ticker}
 							</h1>
@@ -201,15 +156,15 @@
 						</div>
 						{#if noYggs > 0}
 							<div
-								class={`border-l border-gray-300 px-3 text-base uppercase text-gray-500 xl:text-lg`}
+								class={`border-l border-gray-400 px-3 text-base uppercase text-gray-500 xl:text-lg`}
 							>
 								{noYggs} Yggdrasils
 							</div>
 						{/if}
 						<div
-							class={`border-l border-gray-300 px-3 text-base  uppercase text-gray-500 xl:text-lg`}
+							class={`border-l border-gray-400 px-3 text-base  uppercase text-gray-500 xl:text-lg`}
 						>
-							{labelPoolStatus(getPoolStatus(asset, $pools$))} pool
+							{labelByPoolStatus(getPoolStatus(asset, $pools$))} pool
 						</div>
 					</div>
 				</div>
@@ -221,8 +176,8 @@
 							<div
 								class={`w-full rounded-t-lg bg-gray-100 py-3 px-2 text-center text-xs uppercase  text-gray-500`}
 							>
-								{labelVaultType(v.type)}
-								<span class="lower-case">({labelVaultStatus(v.status)})</span>
+								{labelByVaultType(v.type)}
+								<span class="lower-case">({labelByVaultStatus(v.status)})</span>
 							</div>
 							<div class="pt-4 text-xl leading-none text-gray-600">
 								{formatAssetAmountCurrency({
