@@ -3,6 +3,8 @@
 	import { createEventDispatcher } from 'svelte';
 	import type { VaultSort } from '../types/types';
 
+	import { ChevronDownIcon } from '@krowten/svelte-heroicons';
+
 	export let current: VaultSort = 'usd';
 
 	let className = '';
@@ -36,19 +38,7 @@
 		aria-expanded="false"
 	>
 		<span class="flex-grow">{VAULT_SORT_LABEL_MAP[current]}</span>
-		<svg
-			data-prefix="fas"
-			data-icon="caret-down"
-			class="ml-2 w-2"
-			role="img"
-			xmlns="http://www.w3.org/2000/svg"
-			viewBox="0 0 320 512"
-		>
-			<path
-				fill="currentColor"
-				d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"
-			/>
-		</svg>
+		<ChevronDownIcon class="ml-2 h-4 w-4" />
 	</button>
 	<ul
 		class="

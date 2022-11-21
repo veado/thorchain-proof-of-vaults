@@ -25,11 +25,11 @@
 	import { onMount } from 'svelte';
 	import { getNoVaults, getPoolStatus, trimAddress } from './utils/data';
 	import { sequenceSOption } from './utils/fp';
-	import ExternalLinkIcon from './components/IconExternalLink.svelte';
 	import AssetIcon from './components/AssetIcon.svelte';
 	import LoaderIcon from './components/LoaderIcon.svelte';
 	import VaultSortDropdown from './components/VaultSortDropdown.svelte';
 	import { labelByPoolStatus, labelByVaultStatus, labelByVaultType } from './utils/renderer';
+	import { ExternalLinkIcon } from '@krowten/svelte-heroicons';
 
 	$: loading = RD.isPending($dataRD$);
 
@@ -204,7 +204,9 @@
 									class="flex items-center justify-center pt-3 pb-4 text-base text-gray-600 "
 									title={addr}
 								>
-									<span class="">{trimAddress(addr)} </span><ExternalLinkIcon class="ml-1" />
+									<span class="">{trimAddress(addr)} </span><ExternalLinkIcon
+										class="ml-1  h-4 w-4"
+									/>
 								</div>
 							{/if}
 						</div>
