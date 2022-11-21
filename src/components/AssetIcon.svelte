@@ -33,10 +33,13 @@
 
 	import * as FP from 'fp-ts/lib/function';
 	import { getEthTokenAddress } from '../utils/data';
+	import LoaderIcon from './LoaderIcon.svelte';
 
 	let className = '';
 	export { className as class };
 	export let asset: Asset;
+
+	let hasError = false;
 
 	$: imgSrc = (asset: Asset) => {
 		hasError = false;
@@ -119,19 +122,30 @@
 		return IconUnknown;
 	};
 
-	let hasError = false;
-
 	const onImgError = (e: Event) => {
 		hasError = true;
 		(e.target as HTMLImageElement).src = IconUnknown;
 	};
+
+	let loaded = false;
+
+	const onImgLoaded = () => {
+		loaded = true;
+	};
 </script>
 
-<div>
+<div class="relative flex h-full w-full items-center justify-center {className}">
+	<LoaderIcon class="text-gray-400 {loaded || hasError ? 'hidden' : ''} h-10 w-10" />
+
 	<img
-		class={`rounded-full ${hasError ? 'opacity-10' : ''} ${className}`}
+		class="
+    absolute 
+    h-full w-full
+  rounded-full
+     {hasError ? 'opacity-10' : ''}"
 		src={imgSrc(asset)}
-		alt={assetToString(asset)}
+		alt=""
 		on:error={onImgError}
+		on:load={onImgLoaded}
 	/>
 </div>
