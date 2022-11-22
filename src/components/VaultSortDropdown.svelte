@@ -29,7 +29,8 @@
           px-3
           py-1.5
           text-start
-          text-gray-500 hover:shadow-lg
+          text-gray-400 hover:border-gray-500
+          hover:text-gray-500 hover:shadow-lg
           focus:ring-0
         "
 		type="button"

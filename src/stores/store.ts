@@ -33,7 +33,7 @@ import {
 	toReadable
 } from '../utils/data';
 import type * as Ord from 'fp-ts/lib/Ord';
-import { assetAmount } from '@xchainjs/xchain-util';
+import { assetAmount, assetToString } from '@xchainjs/xchain-util';
 
 const midgardConfig = new MidgardConfig({ basePath: MIDGARD_URL });
 const midgardApi = new DefaultApi(midgardConfig);
@@ -65,10 +65,19 @@ const VAULT_SORT_MAP: Record<VaultSort, Ord.Ord<VaultListData>> = {
 };
 
 export const vaultSort$$ = writable<VaultSort>('usd');
+export const vaultSearch$$ = writable<string>('');
 
 export const vaultsSorted$: Readable<VaultList> = derived(
-	[vaultSort$$, vaults$],
-	([vaultSort, vaults]) => FP.pipe(vaults, A.sort(VAULT_SORT_MAP[vaultSort]))
+	[vaultSort$$, vaults$, vaultSearch$$],
+	([vaultSort, vaults, search]) =>
+		FP.pipe(
+			vaults,
+			A.sort(VAULT_SORT_MAP[vaultSort]),
+			A.filter(({ asset }) => {
+				if (!search) return true;
+				return assetToString(asset).toLowerCase().includes(search);
+			})
+		)
 );
 
 const _pools = writable<PoolsDataMap>(new Map());
