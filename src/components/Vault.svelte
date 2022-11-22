@@ -6,7 +6,7 @@
 	import { assetFromString, baseToAsset, formatAssetAmountCurrency } from '@xchainjs/xchain-util';
 	import { ExternalLinkIcon } from '@krowten/svelte-heroicons';
 	import { labelByVaultStatus, labelByVaultType } from '../utils/renderer';
-	import { trimAddress } from '../utils/data';
+	import { getExplorerAddressUrl, trimAddress } from '../utils/data';
 
 	export let data: VaultData;
 	let className = '';
@@ -17,6 +17,11 @@
 		oAddress,
 		O.getOrElse(() => '')
 	);
+
+	const onClickAddress = (address, chain) => {
+		const url = getExplorerAddressUrl(chain, address);
+		window.open(url);
+	};
 </script>
 
 <div class="flex flex-col items-center rounded-lg bg-gray-50 {className}">
@@ -47,8 +52,13 @@
 		)}
 	</div>
 	{#if !!addr}
-		<div class="flex items-center justify-center pt-3 pb-4 text-base text-gray-600 " title={addr}>
-			<span class="">{trimAddress(addr)} </span><ExternalLinkIcon class="ml-1 h-4 w-4" />
-		</div>
+		<button
+			class="flex cursor-pointer items-center justify-center pt-3 pb-4 text-base text-gray-500 hover:text-gray-600"
+			alt={addr}
+			on:click={() => onClickAddress(addr, asset.chain)}
+		>
+			{trimAddress(addr)}
+			<ExternalLinkIcon class="ml-1 h-4 w-4" />
+		</button>
 	{/if}
 </div>
