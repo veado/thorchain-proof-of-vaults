@@ -15,7 +15,6 @@
 	const onChangeHandler = (event: Event) => {
 		const value = (event.currentTarget as HTMLInputElement).value;
 		searchTxt = value;
-		console.log('onChangeHandler', searchTxt);
 		dispatch('change', searchTxt);
 	};
 	const onSearch = () => {

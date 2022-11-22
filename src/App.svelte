@@ -28,12 +28,10 @@
 	$: emptyData = $vaults$.length <= 0 || $pools$.size <= 0;
 
 	const onSearchHandler = ({ detail: search }: CustomEvent<string>) => {
-		console.log('onSearch search:', search);
 		vaultSearch$$.set(search);
 	};
 
 	const onCancelSearchHandler = () => {
-		console.log('onCancel');
 		vaultSearch$$.set('');
 	};
 

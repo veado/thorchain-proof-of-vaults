@@ -74,7 +74,6 @@ export const vaultsSorted$: Readable<VaultList> = derived(
 			vaults,
 			A.sort(VAULT_SORT_MAP[vaultSort]),
 			A.filter(({ asset }) => {
-				console.log('store search:', search);
 				if (!search) return true;
 				return assetToString(asset).toLowerCase().includes(search);
 			})
