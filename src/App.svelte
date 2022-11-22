@@ -22,8 +22,20 @@
 	import * as O from 'fp-ts/lib/Option';
 	import { eqOptionString } from './utils/fp';
 	import SearchInput from './components/SearchInput.svelte';
+	import NoResults from './components/NoResults.svelte';
+	import * as FP from 'fp-ts/lib/function';
+	import Error from './components/Error.svelte';
 
 	$: loading = RD.isPending($dataRD$);
+	$: error = FP.pipe(
+		$dataRD$,
+		RD.fold(
+			() => '',
+			() => '',
+			(error) => error.message || error.toString(),
+			() => ''
+		)
+	);
 
 	$: emptyData = $vaults$.length <= 0 || $pools$.size <= 0;
 
@@ -77,7 +89,7 @@
 				on:click={loadAllData}
 				disabled={loading}
 			>
-				<LoaderIcon class={`mr-2 ${!loading ? 'hidden' : ''}`} />
+				<LoaderIcon class="mr-2 {!loading ? 'hidden' : ''}" />
 				Reload data
 			</button>
 
@@ -118,7 +130,7 @@
 			<!-- sort / search -->
 			<div class="flex w-full flex-col items-center lg:w-auto lg:flex-row lg:items-center">
 				<VaultSortDropdown
-					class="w-[80%] lg:w-[100px] xl:w-[200px]"
+					class="w-[150px]"
 					current={$vaultSort$$}
 					on:item-selected={({ detail }) => vaultSort$$.set(detail)}
 				/>
@@ -149,13 +161,26 @@
 				</button>
 			</div>
 		</div>
-		{#each $vaults$ as vs (assetToString(vs.asset))}
-			<Vaults
-				item={vs}
-				{loading}
-				on:details-visible={updateToggleStatus}
-				bind:collapseStatus={vaultDetailsStatus}
-			/>
-		{/each}
+		{#if error}
+			<Error {error} />
+		{/if}
+		{#if !$vaults$.length && loading}
+			<div class="flex w-full justify-center py-40">
+				<LoaderIcon class="!h-10 !w-10 text-gray-300" />
+			</div>
+		{/if}
+		{#if $vaults$.length}
+			{#each $vaults$ as vs (assetToString(vs.asset))}
+				<Vaults
+					item={vs}
+					{loading}
+					on:details-visible={updateToggleStatus}
+					bind:collapseStatus={vaultDetailsStatus}
+				/>
+			{/each}
+		{/if}
+		{#if !$vaults$.length && RD.isSuccess($dataRD$)}
+			<NoResults class="lg:pb-0" />
+		{/if}
 	</div>
 </main>

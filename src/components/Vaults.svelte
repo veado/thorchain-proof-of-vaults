@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { VaultDetailsStatus, VaultListData } from 'src/types/types';
+	import { fade } from 'svelte/transition';
 
 	import * as FP from 'fp-ts/lib/function';
 
@@ -59,7 +60,7 @@
 			<!-- asset -->
 			<div class="flex items-center pb-3 lg:border-r lg:border-gray-400 lg:pr-10 lg:pb-0 ">
 				<AssetIcon
-					class="h-[40px] w-[40px] lg:h-[60px] lg:w-[60px] xl:h-[70px] xl:w-[70px]"
+					class="h-[45px] w-[45px] lg:h-[60px] lg:w-[60px] xl:h-[70px] xl:w-[70px]"
 					{asset}
 				/>
 				<div class="ml-2 lg:ml-3 xl:ml-5">
@@ -104,12 +105,12 @@
 			</div>
 		</div>
 		<!-- loader -->
-		<div class="my-2 flex justify-center lg:my-4 {loading ? 'block' : 'hidden'} text-gray-400">
+		<div class="my-1 flex justify-center lg:my-3 {loading ? 'visible' : 'invisible'} text-gray-400">
 			<LoaderIcon />
 		</div>
 
 		<!-- vaults content -->
-		<div class="flex items-center py-3 lg:py-5">
+		<div class="flex items-center">
 			<div class="px-2 text-sm uppercase text-gray-500 lg:px-3 lg:text-base xl:text-lg">
 				{noAsgards} Asgards
 			</div>
@@ -128,9 +129,9 @@
 		</div>
 	</div>
 	<!-- toggle button -->
-	<div class="flex justify-center xl:pt-10">
+	<div class="mt-5 flex justify-center xl:mt-10">
 		<button
-			class="rounded-full border border-gray-400 bg-white p-4 text-gray-400 hover:border-gray-500 hover:text-gray-500 hover:shadow-lg "
+			class="rounded-full border-2 border-gray-400 bg-white p-4 text-gray-400 hover:border-gray-500 hover:text-gray-500 hover:shadow-lg "
 			on:click={toggleDetails}
 		>
 			<ChevronDoubleDownIcon class="h-4 w-4 lg:h-6 lg:w-6 {showDetails ? 'rotate-180' : ''}" />
@@ -138,7 +139,10 @@
 	</div>
 	{#if showDetails}
 		<!-- vault details -->
-		<div class="mt-5 grid grid-cols-1 gap-3 lg:grid-cols-2 xl:mt-10 xl:grid-cols-3 xl:gap-6">
+		<div
+			transition:fade={{ duration: 250 }}
+			class="mt-5 grid grid-cols-1 gap-3 lg:grid-cols-2 xl:mt-10 xl:grid-cols-3 xl:gap-6"
+		>
 			{#each data as v (v.asset)}
 				<Vault data={v} />
 			{/each}
