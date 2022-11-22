@@ -21,7 +21,7 @@
 
 <div class="flex flex-col items-center rounded-lg bg-gray-50 {className}">
 	<div
-		class={`w-full rounded-t-lg bg-gray-100 py-3 px-2 text-center text-xs uppercase  text-gray-500`}
+		class="w-full rounded-t-lg bg-gray-100 py-3 px-2 text-center text-xs uppercase  text-gray-500"
 	>
 		{labelByVaultType(type)}
 		<span class="lower-case">({labelByVaultStatus(status)})</span>
