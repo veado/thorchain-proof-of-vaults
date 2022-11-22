@@ -52,7 +52,7 @@
 
 <!-- vaults wrapper -->
 <div
-	class="mb-5 flex flex-col rounded-lg border border-gray-300 p-5 xl:mb-10 xl:rounded-xl xl:p-10 "
+	class="mb-5 flex flex-col rounded-lg border border-gray-300 p-5 lg:p-10 xl:mb-10 xl:rounded-xl "
 >
 	<!-- vault overview -->
 	<div class="flex flex-col items-center justify-center">

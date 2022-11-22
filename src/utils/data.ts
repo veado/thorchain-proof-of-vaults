@@ -9,6 +9,7 @@ import type {
 	VaultTypeEnum
 } from '@xchainjs/xchain-thornode';
 import {
+	Chain,
 	baseAmount,
 	type Asset,
 	type BaseAmount,
@@ -322,3 +323,27 @@ export const getNoVaults = (type: VaultType, list: VaultData[]): number =>
 		list,
 		A.reduce(0, (acc, curr) => (curr.type === type ? acc + 1 : acc))
 	);
+
+export const getExplorerAddressUrl = (chain: Chain, address: Address) => {
+	switch (chain) {
+		case Chain.Avalanche:
+		case Chain.Avax:
+			return `https://snowtrace.io/address/${address}`;
+		case Chain.Binance:
+			return `https://explorer.binance.org/address/${address}`;
+		case Chain.Bitcoin:
+			return `https://blockstream.info/address/${address}`;
+		case Chain.BitcoinCash:
+			return `https://www.blockchain.com/bch/address/${address}`;
+		case Chain.Litecoin:
+			return `https://blockchair.com/litecoin/address/${address}`;
+		case Chain.Doge:
+			return `https://blockchair.com/dogecoin/address/${address}`;
+		case Chain.Cosmos:
+			return `https://cosmos.bigdipper.live/account/${address}`;
+		case Chain.THORChain:
+			return `https://thorchain.net/address/${address}`;
+		case Chain.Ethereum:
+			return `https://etherscan.io/address/${address}`;
+	}
+};
