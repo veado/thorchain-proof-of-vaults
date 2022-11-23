@@ -8,6 +8,8 @@
 interface ImportMetaEnv {
 	readonly VITE_MIDGARD_URL: string;
 	readonly VITE_THORNODE_URL: string;
+	readonly VITE_VERSION: string;
+	readonly VITE_COMMIT_HASH: string;
 }
 
 interface ImportMeta {

@@ -1,7 +1,11 @@
 module.exports = {
 	content: ['./src/**/*.{html,js,svelte,ts}'],
 	theme: {
-		extend: {}
+		extend: {
+			colors: {
+				tc: '#23dcc8'
+			}
+		}
 	},
 	plugins: [require('tw-elements/dist/plugin')]
 };

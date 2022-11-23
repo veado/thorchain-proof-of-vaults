@@ -8,7 +8,7 @@ import { execSync } from 'child_process';
 const { version } = JSON.parse(await readFile(resolve('./package.json'), 'utf-8'));
 
 // Add commit hash to Vite's `env`
-process.env.VITE_COMMIT_HASH = execSync('git rev-parse --short HEAD').toString();
+process.env.VITE_COMMIT_HASH = execSync('git rev-parse --short HEAD').toString().trim();
 
 // Add version no. hash to Vite's `env`
 process.env.VITE_VERSION = version;
