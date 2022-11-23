@@ -25,6 +25,8 @@
 	import NoResults from './components/NoResults.svelte';
 	import * as FP from 'fp-ts/lib/function';
 	import Error from './components/Error.svelte';
+	import GithubIcon from './components/GithubIcon.svelte';
+	import Footer from './components/Footer.svelte';
 
 	$: loading = RD.isPending($dataRD$);
 	$: error = FP.pipe(
@@ -71,12 +73,14 @@
 
 <div class="flex flex-col px-10 md:px-20">
 	<!-- logo + title -->
-	<header class=" container flex flex-col items-center bg-gray-50 py-10">
-		<img
-			src={logo}
-			class="h-[60px] w-[60px] max-w-full rounded-full border-8 border-black"
-			alt=""
-		/>
+	<header class="container flex flex-col items-center bg-gray-50 py-10">
+		<a href="https://thorchain.org/" class="">
+			<img
+				src={logo}
+				class="ease h-[60px] w-[60px] max-w-full rounded-full border-8 border-black hover:scale-110 hover:shadow-xl"
+				alt=""
+			/>
+		</a>
 		<h1 class="mt-2 text-2xl uppercase text-gray-900">Proof Of Vaults</h1>
 	</header>
 	<div class="container flex min-w-[480px] flex-col bg-white shadow-md">
@@ -125,7 +129,9 @@
 				class="flex w-auto items-center rounded-full
            bg-gray-400 px-6 py-1 text-lg uppercase text-white
             hover:bg-tc 
-         hover:shadow-lg {loading ? 'cursor-not-allowed' : 'cursor-pointer'}"
+         hover:shadow-lg {loading ? 'cursor-not-allowed' : 'cursor-pointer hover:scale-105'}
+         ease
+         "
 				on:click={loadAllData}
 				disabled={loading}
 			>
@@ -184,8 +190,9 @@
 				{/each}
 			{/if}
 			{#if !$vaults$.length && RD.isSuccess($dataRD$)}
-				<NoResults class="lg:pb-0" />
+				<NoResults class="" />
 			{/if}
 		</main>
 	</div>
+	<Footer />
 </div>

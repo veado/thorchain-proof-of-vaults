@@ -131,7 +131,7 @@
 	<!-- toggle button -->
 	<div class="mt-5 flex justify-center xl:mt-10">
 		<button
-			class="rounded-full border-2 border-gray-400 bg-white p-4 text-gray-400 hover:border-tc hover:text-tc hover:shadow-lg "
+			class="ease rounded-full border-2 border-gray-400 bg-white p-4 text-gray-400 hover:scale-105 hover:border-tc hover:text-tc hover:shadow-lg"
 			on:click={toggleDetails}
 		>
 			<ChevronDoubleDownIcon class="h-4 w-4 lg:h-6 lg:w-6 {showDetails ? 'rotate-180' : ''}" />
