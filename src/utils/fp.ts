@@ -15,15 +15,21 @@ export const sequenceSTaskEither = sequenceS(TE.ApplicativePar);
 export const sequenceSOption = sequenceS(O.Applicative);
 export const sequenceTOption = sequenceT(O.Apply);
 
-export const monoidBaseAmount: Monoid<BaseAmount> = {
-	concat: (x, y) => x.plus(y),
-	empty: baseAmount(0)
-};
+export const monoidBaseAmount = (decimal: number): Monoid<BaseAmount> => ({
+	concat: (x, y) => {
+		if (x.decimal !== y.decimal) console.error(`Decimal should be equal ${x.decimal} ${y.decimal}`);
+		return x.plus(y, x.decimal);
+	},
+	empty: baseAmount(0, decimal)
+});
 
-export const monoidAssetAmount: Monoid<AssetAmount> = {
-	concat: (x, y) => x.plus(y),
-	empty: assetAmount(0)
-};
+export const monoidAssetAmount = (decimal: number): Monoid<AssetAmount> => ({
+	concat: (x, y) => {
+		if (x.decimal !== y.decimal) console.error(`Decimal should be equal ${x.decimal} ${y.decimal}`);
+		return x.plus(y, x.decimal);
+	},
+	empty: assetAmount(0, decimal)
+});
 
 export const eqOptionString = O.getEq(S.Eq);
 
