@@ -6,7 +6,13 @@
 
 	import * as O from 'fp-ts/lib/Option';
 
-	import { formatAssetAmountCurrency, baseToAsset, assetAmount } from '@xchainjs/xchain-util';
+	import {
+		formatAssetAmountCurrency,
+		baseToAsset,
+		assetAmount,
+		eqAsset,
+		AssetRuneNative
+	} from '@xchainjs/xchain-util';
 
 	import { pools$ } from '../stores/store';
 	import { getNoVaults, getPoolStatus } from '../utils/data';
@@ -49,6 +55,7 @@
 
 	const noAsgards = getNoVaults('asgard', data);
 	const noYggs = getNoVaults('ygg', data);
+	const noNodes = getNoVaults('bond', data);
 </script>
 
 <!-- vaults wrapper -->
@@ -126,21 +133,27 @@
 
 		<!-- vaults content -->
 		<div class="flex items-center">
-			<div class="px-2 text-sm uppercase text-gray-500 lg:px-3 lg:text-base xl:text-lg">
-				{noAsgards} Asgards
-			</div>
-			{#if noYggs > 0}
+			{#if eqAsset(asset, AssetRuneNative)}
+				<div class="px-2 text-sm uppercase text-gray-500 lg:px-3 lg:text-base xl:text-lg">
+					{noNodes} Nodes
+				</div>
+			{:else}
+				<div class="px-2 text-sm uppercase text-gray-500 lg:px-3 lg:text-base xl:text-lg">
+					{noAsgards} Asgards
+				</div>
+				{#if noYggs > 0}
+					<div
+						class="border-l border-gray-400 px-3 text-sm uppercase text-gray-500 lg:text-base xl:text-lg"
+					>
+						{noYggs} Yggdrasils
+					</div>
+				{/if}
 				<div
-					class="border-l border-gray-400 px-3 text-sm uppercase text-gray-500 lg:text-base xl:text-lg"
+					class="border-l border-gray-400 px-3 text-sm uppercase  text-gray-500 lg:text-base xl:text-lg"
 				>
-					{noYggs} Yggdrasils
+					{labelByPoolStatus(getPoolStatus(asset, $pools$))} pool
 				</div>
 			{/if}
-			<div
-				class="border-l border-gray-400 px-3 text-sm uppercase  text-gray-500 lg:text-base xl:text-lg"
-			>
-				{labelByPoolStatus(getPoolStatus(asset, $pools$))} pool
-			</div>
 		</div>
 	</div>
 	<!-- toggle button -->

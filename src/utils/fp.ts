@@ -5,6 +5,7 @@ import * as S from 'fp-ts/lib/string';
 import * as N from 'fp-ts/lib/number';
 import * as Ord from 'fp-ts/lib/Ord';
 import type * as Eq from 'fp-ts/lib/Eq';
+import * as A from 'fp-ts/lib/Array';
 
 import type BigNumber from 'bignumber.js';
 import { assetAmount, baseAmount, type AssetAmount, type BaseAmount } from '@xchainjs/xchain-util';
@@ -32,6 +33,9 @@ export const monoidAssetAmount = (decimal: number): Monoid<AssetAmount> => ({
 });
 
 export const eqOptionString = O.getEq(S.Eq);
+
+// Merges two lists of strings and removes duplications from it
+export const unionString = A.union(S.Eq);
 
 const eqBigNumber: Eq.Eq<BigNumber> = {
 	equals: (x, y) => x.isEqualTo(y)

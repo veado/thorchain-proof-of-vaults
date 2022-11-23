@@ -26,14 +26,14 @@ import {
 } from '../utils/fp';
 import type { DataAD, PoolsDataMap, VaultList, VaultListData, VaultSort } from '../types/types';
 import {
-	getPoolsData,
-	toNodesVaultDataMap,
-	toNodesMap,
+	toPoolsDataMap,
+	toNodesDataMap,
 	toVaultList,
-	toReadable
+	toReadable,
+	toNodesVaultList
 } from '../utils/data';
 import type * as Ord from 'fp-ts/lib/Ord';
-import { assetAmount, assetToString } from '@xchainjs/xchain-util';
+import { assetToString, bnOrZero } from '@xchainjs/xchain-util';
 
 const midgardConfig = new MidgardConfig({ basePath: MIDGARD_URL });
 const midgardApi = new DefaultApi(midgardConfig);
@@ -228,20 +228,23 @@ export const loadAllData = async () =>
 						dataRD$$.set(RD.failure(e));
 					},
 					({ asgards, yggs, pools, nodes, stats }) => {
-						const poolsDataMap = getPoolsData(pools);
+						const poolsDataMap = toPoolsDataMap(pools);
 
-						const vaultList = toVaultList({
+						const asgardYggsList = toVaultList({
 							vaults: [...asgards, ...yggs],
 							poolsData: poolsDataMap
 						});
-						const nodesMap = toNodesMap(nodes);
-						const _asgardBondVaults = toNodesVaultDataMap({
-							vaults: asgards,
-							runeUSDPrice: assetAmount(stats.runePriceUSD),
-							nodes: nodesMap
+						const runeUSDPrice = bnOrZero(stats.runePriceUSD);
+						const nodesDataMap = toNodesDataMap(nodes);
+						const nodeVaultList = toNodesVaultList({
+							vaults: [...asgards, ...yggs],
+							runeUSDPrice,
+							nodesData: nodesDataMap
 						});
 
-						dataRD$$.set(RD.success({ vaults: vaultList, pools: poolsDataMap, nodes }));
+						const vaults = [...asgardYggsList, ...nodeVaultList];
+
+						dataRD$$.set(RD.success({ vaults, pools: poolsDataMap, nodes }));
 					}
 				)
 			)

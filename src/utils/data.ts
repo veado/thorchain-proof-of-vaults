@@ -21,16 +21,16 @@ import {
 	type AssetAmount,
 	eqAsset,
 	bn,
-	assetAmount
+	assetAmount,
+	AssetRuneNative
 } from '@xchainjs/xchain-util';
 import * as FP from 'fp-ts/lib/function';
 import * as A from 'fp-ts/lib/Array';
 import * as O from 'fp-ts/lib/Option';
 import * as M from 'fp-ts/lib/Monoid';
 import type {
-	BondsDataMap,
 	NodesData,
-	NodesMap,
+	NodesDataMap,
 	PoolsDataMap,
 	PoolStatus,
 	VaultData,
@@ -45,7 +45,8 @@ import {
 	monoidAssetAmount,
 	monoidBaseAmount,
 	ordVaultDataByTypeStatusReverse,
-	sequenceSOption
+	sequenceSOption,
+	unionString
 } from './fp';
 import { derived, type Readable, type Writable } from 'svelte/store';
 
@@ -73,18 +74,21 @@ export const convertBaseAmountDecimal = (amount: BaseAmount, decimal: number): B
 /** Helper to convert Writable -> Readable */
 export const toReadable = <T>(v$$: Writable<T>): Readable<T> => derived(v$$, FP.identity);
 
-export const toNodesMap = (nodes: Node[]): NodesMap =>
+export const toNodesDataMap = (nodes: Node[]): NodesDataMap =>
 	FP.pipe(
 		nodes,
-		A.reduce(new Map(), (acc, cur: Node) => {
+		A.reduce<Node, NodesDataMap>(new Map(), (acc, cur: Node) => {
 			const sec = cur.pub_key_set.secp256k1;
-			if (sec)
+			if (sec) {
+				const bondAmount = baseAmount(cur.bond, THORNODE_DECIMAL);
 				return acc.set(sec, {
-					bondAmount: baseAmount(cur.bond, THORNODE_DECIMAL),
+					bondAmount,
 					nodeStatus: cur.status,
 					bondAddress: cur.bond_address
 				});
-			else return acc;
+			} else {
+				return acc;
+			}
 		})
 	);
 
@@ -94,7 +98,7 @@ export const filterNodes = (nodes: Node[], status: NodeStatusEnum) =>
 		A.filter((node) => node.status === status)
 	);
 
-export const getPoolsData = (pools: PoolDetails): PoolsDataMap =>
+export const toPoolsDataMap = (pools: PoolDetails): PoolsDataMap =>
 	FP.pipe(
 		pools,
 		A.reduce<PoolDetail, PoolsDataMap>(new Map(), (acc, cur: PoolDetail) =>
@@ -120,7 +124,7 @@ export const getPoolsData = (pools: PoolDetails): PoolsDataMap =>
 		)
 	);
 
-export const getTotalBonds = (members: Address[], nodes: NodesMap): BaseAmount =>
+export const getTotalBonds = (members: Address[], nodes: NodesDataMap): BaseAmount =>
 	FP.pipe(
 		members,
 		A.filterMap((member: string) => O.fromNullable(nodes.get(member).bondAmount)),
@@ -233,7 +237,7 @@ export const toVaultList = ({
 		A.map((vault: Vault) => toVaultData({ vault, poolsData })),
 		A.flatten,
 		// ignore zero balances
-		A.filter((v) => v.amount.gt(baseAmount(0))),
+		A.filter(({ amount }: VaultData) => amount.gt(baseAmount(0))),
 		// Transform [VaultData] -> [{asset: Asset, data: VaultData}]
 		A.reduce<VaultData, Array<Pick<VaultListData, 'asset' | 'data'>>>(
 			[],
@@ -262,44 +266,62 @@ export const toVaultList = ({
 	);
 
 /**
- * Takes vaults to get bonds of all members
+ * Takes vaults (asgard and/or ygg) to get value of assets
  */
-export const toNodesVaultDataMap = ({
+export const toNodesVaultList = ({
 	vaults,
-	nodes,
-	runeUSDPrice
+	runeUSDPrice,
+	nodesData
 }: {
 	vaults: Vault[];
-	nodes: NodesMap;
-	runeUSDPrice: AssetAmount;
-}): BondsDataMap =>
-	FP.pipe(
+	runeUSDPrice: BigNumber;
+	nodesData: NodesDataMap;
+}): VaultList => {
+	const members = FP.pipe(
 		vaults,
 		A.map((vault: Vault) =>
 			FP.pipe(
 				vault.membership,
-				A.filterMap((member) => {
-					const oNodeData = O.fromNullable(nodes.get(member));
-					const oAsset = O.fromNullable(assetFromString('THOR.RUNE'));
-					return FP.pipe(
-						sequenceSOption({ node: oNodeData, asset: oAsset }),
-						O.map<{ node: NodesData; asset: Asset }, VaultData>(
-							({ node: { bondAddress, bondAmount, nodeStatus }, asset }) => ({
-								asset,
-								address: O.some(bondAddress),
-								amount: bondAmount,
-								type: 'bond',
-								status: nodeStatus,
-								amountUSD: O.some(baseToAsset(bondAmount).times(runeUSDPrice))
-							})
-						)
-					);
-				})
+				A.reduce([], (acc, member) => (member ? [...acc, member] : acc))
 			)
 		),
 		A.flatten,
-		(bondsData) => new Map([['THOR.RUNE', bondsData]])
+		// remove duplications
+		(members) => unionString(members)(members)
 	);
+
+	const vaultData = FP.pipe(
+		members,
+		A.filterMap((member) => {
+			const oNodeData = O.fromNullable(nodesData.get(member));
+			const oAsset = O.fromNullable(assetFromString('THOR.RUNE'));
+			return FP.pipe(
+				sequenceSOption({ node: oNodeData, asset: oAsset }),
+				O.map<{ node: NodesData; asset: Asset }, VaultData>(
+					({ node: { bondAddress, bondAmount, nodeStatus }, asset }) => ({
+						asset,
+						address: O.some(bondAddress),
+						amount: bondAmount,
+						type: 'bond',
+						status: nodeStatus,
+						amountUSD: O.some(
+							baseToAsset(bondAmount).times(assetAmount(runeUSDPrice, THORNODE_DECIMAL))
+						)
+					})
+				)
+			);
+		}),
+		(nodeVaults) => ({
+			asset: AssetRuneNative,
+			total: sumAmounts(nodeVaults),
+			totalUSD: O.some(sumUSDAmounts(nodeVaults)),
+			assetPriceUSD: O.some(runeUSDPrice),
+			data: nodeVaults
+		})
+	);
+
+	return [vaultData];
+};
 
 export const sumAmounts = (amounts: Array<Pick<VaultData, 'amount'>>): BaseAmount => {
 	const decimal = FP.pipe(
