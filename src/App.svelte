@@ -69,31 +69,71 @@
 	onMount(loadAllData);
 </script>
 
-<main class="flex flex-col p-10 md:p-20">
-	<div class="container flex min-w-[480px] flex-col bg-white p-10 shadow-md lg:p-20">
-		<!-- logo + title -->
-		<div class="mb-5 flex justify-center">
-			<img
-				src={logo}
-				class="h-[50px] w-[50px] max-w-full rounded-full border-4 border-black"
-				alt=""
-			/>
-		</div>
-		<h1 class="text-center text-2xl uppercase">Proof Of Vaults</h1>
+<div class="flex flex-col px-10 md:px-20">
+	<!-- logo + title -->
+	<header class=" container flex flex-col items-center bg-gray-50 py-10">
+		<img
+			src={logo}
+			class="h-[60px] w-[60px] max-w-full rounded-full border-8 border-black"
+			alt=""
+		/>
+		<h1 class="mt-2 text-2xl uppercase text-gray-900">Proof Of Vaults</h1>
+	</header>
+	<div class="container flex min-w-[480px] flex-col bg-white shadow-md">
+		<nav class="w-full bg-gray-200 py-3 px-10 ">
+			<!-- sort / search -->
+			<div class="flex flex-col items-center lg:flex-row">
+				<div class="flex items-center">
+					<VaultSortDropdown
+						class="w-[150px]"
+						current={$vaultSort$$}
+						on:item-selected={({ detail }) => vaultSort$$.set(detail)}
+					/>
+					<SearchInput
+						class="ml-10 w-[300px]"
+						placeholder="Search assets"
+						on:search={onSearchHandler}
+						on:change={onSearchHandler}
+						on:cancel={onCancelSearchHandler}
+					/>
+				</div>
+
+				<!-- collapse / expand -->
+				<div class="mt-2 flex flex-1 items-center justify-end lg:mt-0">
+					<button
+						class="ml-2 text-gray-400 underline hover:text-tc"
+						on:click={expandDetails}
+						disabled={vaultDetailsExpanded}
+					>
+						Expand All
+					</button>
+					<button
+						class="ml-2 text-gray-400 underline hover:text-tc"
+						on:click={collapseDetails}
+						disabled={vaultDetailsCollapsed}
+					>
+						Collapse All
+					</button>
+				</div>
+			</div>
+		</nav>
 
 		<!-- reload -->
-		<div class="my-10 flex flex-col items-center justify-center">
+
+		<div class="mt-10 flex w-full flex-col items-center">
 			<button
-				class="text-md flex w-auto items-center rounded-full bg-gray-500 px-6 py-2 uppercase text-white
-         hover:bg-gray-600 hover:shadow-lg {loading ? 'cursor-not-allowed' : 'cursor-pointer'}"
+				class="flex w-auto items-center rounded-full
+           bg-gray-400 px-6 py-1 text-lg uppercase text-white
+            hover:bg-tc 
+         hover:shadow-lg {loading ? 'cursor-not-allowed' : 'cursor-pointer'}"
 				on:click={loadAllData}
 				disabled={loading}
 			>
 				<LoaderIcon class="mr-2 {!loading ? 'hidden' : ''}" />
-				Reload data
+				Reload Vaults
 			</button>
 
-			<div class="form-check items-center py-2">
+			<div class="form-check mt-2">
 				<input
 					id="autoreload"
 					type="checkbox"
@@ -104,7 +144,7 @@
           cursor-pointer 
           appearance-none 
           rounded-sm border border-gray-400 bg-white bg-contain bg-center bg-no-repeat 
-          align-top checked:border-none checked:bg-gray-500 focus:outline-none"
+          align-top checked:border-none checked:bg-gray-400 focus:outline-none"
 					checked={$autoReload$$}
 					disabled={loading}
 					on:change={() => autoReload$$.update((v) => !v)}
@@ -124,63 +164,28 @@
 			</div>
 		</div>
 
-		<div
-			class="flex flex-col items-center py-1 lg:flex-row lg:items-end lg:justify-between lg:py-4"
-		>
-			<!-- sort / search -->
-			<div class="flex w-full flex-col items-center lg:w-auto lg:flex-row lg:items-center">
-				<VaultSortDropdown
-					class="w-[150px]"
-					current={$vaultSort$$}
-					on:item-selected={({ detail }) => vaultSort$$.set(detail)}
-				/>
-
-				<SearchInput
-					class="mt-5 w-[80%] lg:mt-0 lg:ml-5 lg:w-[300px]"
-					placeholder="Search asset"
-					on:search={onSearchHandler}
-					on:change={onSearchHandler}
-					on:cancel={onCancelSearchHandler}
-				/>
-			</div>
-			<!-- collapse -->
-			<div class="my-3 flex items-center lg:mt-0">
-				<button
-					class="ml-2 text-gray-400 underline hover:text-gray-500"
-					on:click={expandDetails}
-					disabled={vaultDetailsExpanded}
-				>
-					Expand All
-				</button>
-				<button
-					class="ml-2 text-gray-400 underline hover:text-gray-500"
-					on:click={collapseDetails}
-					disabled={vaultDetailsCollapsed}
-				>
-					Collapse All
-				</button>
-			</div>
-		</div>
-		{#if error}
-			<Error {error} />
-		{/if}
-		{#if !$vaults$.length && loading}
-			<div class="flex w-full justify-center py-40">
-				<LoaderIcon class="!h-10 !w-10 text-gray-300" />
-			</div>
-		{/if}
-		{#if $vaults$.length}
-			{#each $vaults$ as vs (assetToString(vs.asset))}
-				<Vaults
-					item={vs}
-					{loading}
-					on:details-visible={updateToggleStatus}
-					bind:collapseStatus={vaultDetailsStatus}
-				/>
-			{/each}
-		{/if}
-		{#if !$vaults$.length && RD.isSuccess($dataRD$)}
-			<NoResults class="lg:pb-0" />
-		{/if}
+		<main class="p-20 md:p-10">
+			{#if error}
+				<Error {error} />
+			{/if}
+			{#if !$vaults$.length && loading}
+				<div class="flex w-full justify-center py-40">
+					<LoaderIcon class="!h-10 !w-10 text-gray-300" />
+				</div>
+			{/if}
+			{#if $vaults$.length}
+				{#each $vaults$ as vs (assetToString(vs.asset))}
+					<Vaults
+						item={vs}
+						{loading}
+						on:details-visible={updateToggleStatus}
+						bind:collapseStatus={vaultDetailsStatus}
+					/>
+				{/each}
+			{/if}
+			{#if !$vaults$.length && RD.isSuccess($dataRD$)}
+				<NoResults class="lg:pb-0" />
+			{/if}
+		</main>
 	</div>
-</main>
+</div>

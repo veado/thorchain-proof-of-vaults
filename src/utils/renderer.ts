@@ -41,8 +41,8 @@ export const labelByVaultType = (type: VaultType) => {
 };
 
 export const VAULT_SORT_LABEL_MAP: Record<VaultSort, string /* label*/> = {
-	usd: 'USD ↑',
-	usdRev: 'USD ↓',
-	name: 'Asset ↑',
-	nameRev: 'Asset ↓'
+	usd: 'USD ↓',
+	usdRev: 'USD ↑',
+	name: 'Asset ↓',
+	nameRev: 'Asset ↑'
 };
