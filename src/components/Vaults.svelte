@@ -108,11 +108,11 @@
 							O.fold(
 								() => '',
 								(price) =>
-									`(${formatAssetAmountCurrency({
+									`(1 ${asset.ticker} = ${formatAssetAmountCurrency({
 										amount: assetAmount(price, THORNODE_DECIMAL),
-										decimal: 8,
+										decimal: THORNODE_DECIMAL,
 										trimZeros: true
-									})} / ${asset.ticker})`
+									})})`
 							)
 						)}
 					</span>
