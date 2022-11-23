@@ -53,7 +53,7 @@
 	</div>
 	{#if !!addr}
 		<button
-			class="flex cursor-pointer items-center justify-center pt-3 pb-4 text-base text-gray-500 hover:text-gray-600"
+			class="flex cursor-pointer items-center justify-center pt-3 pb-4 text-base text-gray-500 hover:text-tc"
 			alt={addr}
 			on:click={() => onClickAddress(addr, asset.chain)}
 		>

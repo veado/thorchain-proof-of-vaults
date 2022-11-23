@@ -37,7 +37,7 @@
 
 <div class="relative {className}">
 	<input
-		type="search"
+		type="text"
 		{placeholder}
 		class="border-red peer w-full appearance-none border border-gray-400 px-8 py-1.5 text-gray-400 
     placeholder:uppercase hover:border-gray-500 
