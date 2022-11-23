@@ -27,6 +27,7 @@ export type BondsDataMap = Map<'THOR.RUNE', VaultData[]>;
 export type VaultListData = {
 	asset: Asset;
 	total: BaseAmount;
+	assetPriceUSD: O.Option<BigNumber>;
 	totalUSD: O.Option<AssetAmount>;
 	data: VaultData[];
 };
@@ -56,7 +57,7 @@ export type PoolStatus = 'available' | 'staged' | 'suspended' | 'unknown';
 export type PoolsData = {
 	asset: Asset;
 	status: PoolStatus;
-	priceUSD: BigNumber;
+	assetPriceUSD: BigNumber;
 	runeDepth: BigNumber;
 	decimal: number;
 };

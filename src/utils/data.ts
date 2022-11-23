@@ -20,7 +20,8 @@ import {
 	baseToAsset,
 	type AssetAmount,
 	eqAsset,
-	bn
+	bn,
+	assetAmount
 } from '@xchainjs/xchain-util';
 import * as FP from 'fp-ts/lib/function';
 import * as A from 'fp-ts/lib/Array';
@@ -109,7 +110,7 @@ export const getPoolsData = (pools: PoolDetails): PoolsDataMap =>
 						return acc.set(cur.asset, {
 							asset,
 							status: (cur.status || 'unknown') as PoolStatus,
-							priceUSD: bnOrZero(cur.assetPriceUSD),
+							assetPriceUSD: bnOrZero(cur.assetPriceUSD),
 							runeDepth: bnOrZero(cur.runeDepth),
 							decimal
 						});
@@ -133,6 +134,13 @@ export const getAddress = (addresses: VaultAddress[], chain: string): O.Option<A
 		O.map(({ address }) => address)
 	);
 
+export const getAssetPriceUSD = (asset: Asset, poolsData: PoolsDataMap): O.Option<BigNumber> =>
+	FP.pipe(
+		poolsData.get(assetToString(asset)),
+		O.fromNullable,
+		O.map(({ assetPriceUSD }) => assetPriceUSD)
+	);
+
 export const getPrice = ({
 	asset,
 	amount,
@@ -143,11 +151,11 @@ export const getPrice = ({
 	poolsData: PoolsDataMap;
 }): O.Option<AssetAmount> =>
 	FP.pipe(
-		poolsData.get(assetToString(asset)),
-		O.fromNullable,
-		O.map(({ priceUSD: price }) =>
-			baseToAsset(baseAmount(amount.amount().times(price), amount.decimal))
-		)
+		getAssetPriceUSD(asset, poolsData),
+		O.map((price) => {
+			const _assetAmount = baseToAsset(amount);
+			return assetAmount(_assetAmount.amount().times(price), _assetAmount.decimal);
+		})
 	);
 
 export const getDecimal = (asset: Asset, poolsData: PoolsDataMap): number =>
@@ -243,7 +251,8 @@ export const toVaultList = ({
 		A.map<Pick<VaultListData, 'asset' | 'data'>, VaultListData>((v) => ({
 			...v,
 			total: sumAmounts(v.data),
-			totalUSD: O.some(sumUSDAmounts(v.data))
+			totalUSD: O.some(sumUSDAmounts(v.data)),
+			assetPriceUSD: getAssetPriceUSD(v.asset, poolsData)
 		})),
 		// sort data
 		A.map<VaultListData, VaultListData>((v) => ({
@@ -292,19 +301,37 @@ export const toNodesVaultDataMap = ({
 		(bondsData) => new Map([['THOR.RUNE', bondsData]])
 	);
 
-export const sumAmounts = (amounts: Array<Pick<VaultData, 'amount'>>): BaseAmount =>
-	FP.pipe(
+export const sumAmounts = (amounts: Array<Pick<VaultData, 'amount'>>): BaseAmount => {
+	const decimal = FP.pipe(
 		amounts,
 		A.map(({ amount }) => amount),
-		M.concatAll(monoidBaseAmount)
+		A.head,
+		O.map(({ decimal }) => decimal),
+		O.getOrElse(() => THORNODE_DECIMAL)
 	);
 
-export const sumUSDAmounts = (amounts: Array<Pick<VaultData, 'amountUSD'>>): AssetAmount =>
-	FP.pipe(
+	return FP.pipe(
+		amounts,
+		A.map(({ amount }) => amount),
+		M.concatAll(monoidBaseAmount(decimal))
+	);
+};
+
+export const sumUSDAmounts = (amounts: Array<Pick<VaultData, 'amountUSD'>>): AssetAmount => {
+	const decimal = FP.pipe(
 		amounts,
 		A.filterMap(({ amountUSD }) => amountUSD),
-		M.concatAll(monoidAssetAmount)
+		A.head,
+		O.map(({ decimal }) => decimal),
+		O.getOrElse(() => THORNODE_DECIMAL)
 	);
+
+	return FP.pipe(
+		amounts,
+		A.filterMap(({ amountUSD }) => amountUSD),
+		M.concatAll(monoidAssetAmount(decimal))
+	);
+};
 
 export const trimAddress = (addr: Address) => {
 	const l = addr.length;

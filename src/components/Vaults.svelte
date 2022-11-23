@@ -17,6 +17,7 @@
 	import Vault from './Vault.svelte';
 	import { createEventDispatcher } from 'svelte';
 	import { ChevronDoubleDownIcon } from '@krowten/svelte-heroicons';
+	import { THORNODE_DECIMAL } from '../stores/const';
 
 	export let item: VaultListData = undefined;
 	export let loading = false;
@@ -44,7 +45,7 @@
 		dispatch('details-visible', showDetails);
 	};
 
-	const { asset, data, total, totalUSD } = item;
+	const { asset, data, total, totalUSD, assetPriceUSD } = item;
 
 	const noAsgards = getNoVaults('asgard', data);
 	const noYggs = getNoVaults('ygg', data);
@@ -86,7 +87,7 @@
 					})}
 				</h3>
 				<h3
-					class="lg:text-1xl py-0 pt-1 text-center text-lg leading-none text-gray-300 lg:text-start xl:text-2xl"
+					class="lg:text-1xl py-0 pt-1 text-center text-lg leading-none text-gray-400 lg:text-start xl:text-2xl"
 				>
 					{FP.pipe(
 						totalUSD,
@@ -96,11 +97,25 @@
 							(totalUSD) =>
 								formatAssetAmountCurrency({
 									amount: totalUSD,
-									decimal: 2,
-									trimZeros: false
+									decimal: 6,
+									trimZeros: true
 								})
 						)
 					)}
+					<span class="block text-sm text-gray-300 lg:inline-block">
+						{FP.pipe(
+							assetPriceUSD,
+							O.fold(
+								() => '',
+								(price) =>
+									`(${formatAssetAmountCurrency({
+										amount: assetAmount(price, THORNODE_DECIMAL),
+										decimal: 8,
+										trimZeros: true
+									})} / ${asset.ticker})`
+							)
+						)}
+					</span>
 				</h3>
 			</div>
 		</div>
@@ -131,7 +146,7 @@
 	<!-- toggle button -->
 	<div class="mt-5 flex justify-center xl:mt-10">
 		<button
-			class="ease rounded-full border-2 border-gray-400 bg-white p-4 text-gray-400 hover:scale-105 hover:border-tc hover:text-tc hover:shadow-lg"
+			class="ease rounded-full border-2 border-gray-400 bg-white p-2 text-gray-400 hover:scale-105 hover:border-tc hover:text-tc hover:shadow-lg lg:p-4 "
 			on:click={toggleDetails}
 		>
 			<ChevronDoubleDownIcon class="h-4 w-4 lg:h-6 lg:w-6 {showDetails ? 'rotate-180' : ''}" />
