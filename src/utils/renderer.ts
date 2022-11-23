@@ -34,7 +34,7 @@ export const labelByVaultType = (type: VaultType) => {
 		case 'ygg':
 			return 'Yggdrasil';
 		case 'bond':
-			return 'bond';
+			return 'node';
 		case 'unknown':
 			return 'unknown';
 	}

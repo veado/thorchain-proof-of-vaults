@@ -22,8 +22,6 @@ export type VaultData = {
 	status: VaultStatus;
 };
 
-export type BondsDataMap = Map<'THOR.RUNE', VaultData[]>;
-
 export type VaultListData = {
 	asset: Asset;
 	total: BaseAmount;
@@ -47,7 +45,7 @@ export type NodesData = {
 	nodeStatus: NodeStatusEnum;
 	bondAddress: Address;
 };
-export type NodesMap = Map<Address, NodesData>;
+export type NodesDataMap = Map<Address, NodesData>;
 
 /**
  * PoolStatus
