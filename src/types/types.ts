@@ -43,7 +43,7 @@ export type NodeBondsMap = Map<Address, BaseAmount>;
 export type NodesData = {
 	bondAmount: BaseAmount;
 	nodeStatus: NodeStatusEnum;
-	bondAddress: Address;
+	nodeAddress: Address;
 };
 export type NodesDataMap = Map<Address, NodesData>;
 

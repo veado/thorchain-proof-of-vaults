@@ -84,7 +84,7 @@ export const toNodesDataMap = (nodes: Node[]): NodesDataMap =>
 				return acc.set(sec, {
 					bondAmount,
 					nodeStatus: cur.status,
-					bondAddress: cur.bond_address
+					nodeAddress: cur.node_address
 				});
 			} else {
 				return acc;
@@ -122,13 +122,6 @@ export const toPoolsDataMap = (pools: PoolDetails): PoolsDataMap =>
 				)
 			)
 		)
-	);
-
-export const getTotalBonds = (members: Address[], nodes: NodesDataMap): BaseAmount =>
-	FP.pipe(
-		members,
-		A.filterMap((member: string) => O.fromNullable(nodes.get(member).bondAmount)),
-		A.reduce(baseAmount(0, THORNODE_DECIMAL), (acc, cur: BaseAmount) => acc.plus(cur))
 	);
 
 export const getAddress = (addresses: VaultAddress[], chain: string): O.Option<Address> =>
@@ -208,7 +201,7 @@ const toVaultData = ({
 							getDecimal(asset, poolsData)
 						);
 
-					return {
+					const vaultData: VaultData = {
 						asset,
 						address: getAddress(vault.addresses, asset.chain),
 						amount,
@@ -216,6 +209,8 @@ const toVaultData = ({
 						type: vault.type ? toVaultType(vault.type) : 'unknown',
 						status: (vault?.status ?? 'unknown') as VaultStatus
 					};
+
+					return vaultData;
 				})
 			);
 		})
@@ -298,9 +293,9 @@ export const toNodesVaultList = ({
 			return FP.pipe(
 				sequenceSOption({ node: oNodeData, asset: oAsset }),
 				O.map<{ node: NodesData; asset: Asset }, VaultData>(
-					({ node: { bondAddress, bondAmount, nodeStatus }, asset }) => ({
+					({ node: { nodeAddress, bondAmount, nodeStatus }, asset }) => ({
 						asset,
-						address: O.some(bondAddress),
+						address: O.some(nodeAddress),
 						amount: bondAmount,
 						type: 'bond',
 						status: nodeStatus,
@@ -391,7 +386,7 @@ export const getExplorerAddressUrl = (chain: Chain, address: Address) => {
 		case Chain.Cosmos:
 			return `https://cosmos.bigdipper.live/account/${address}`;
 		case Chain.THORChain:
-			return `https://thorchain.net/address/${address}`;
+			return `https://thorchain.net/node/${address}`;
 		case Chain.Ethereum:
 			return `https://etherscan.io/address/${address}`;
 	}
