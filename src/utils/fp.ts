@@ -73,7 +73,7 @@ const getOrdVaultDataValueByTypeStatus = ({ type, status }: VaultData): number =
 	switch (type) {
 		case 'unknown':
 			return 0;
-		case 'bond':
+		case 'node':
 			if (status === 'Active') return 1;
 			if (status === 'Standby') return 2;
 			return 0;
@@ -92,4 +92,12 @@ export const ordVaultDataByTypeStatus: Ord.Ord<VaultData> = Ord.fromCompare((x, 
 	N.Ord.compare(getOrdVaultDataValueByTypeStatus(x), getOrdVaultDataValueByTypeStatus(y))
 );
 export const ordVaultDataByTypeStatusReverse: Ord.Ord<VaultData> =
+	Ord.reverse(ordVaultDataByTypeStatus);
+
+const getOrdVaultDataValueByVaultNo = ({ vaultNo }: VaultData): number => vaultNo;
+
+export const ordVaultDataByVaultNo: Ord.Ord<VaultData> = Ord.fromCompare((x, y) =>
+	N.Ord.compare(getOrdVaultDataValueByVaultNo(x), getOrdVaultDataValueByVaultNo(y))
+);
+export const ordVaultDataByVaultNoReverse: Ord.Ord<VaultData> =
 	Ord.reverse(ordVaultDataByTypeStatus);

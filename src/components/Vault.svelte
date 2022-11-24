@@ -5,14 +5,16 @@
 	import { sequenceSOption } from '../utils/fp';
 	import { assetFromString, baseToAsset, formatAssetAmountCurrency } from '@xchainjs/xchain-util';
 	import { ExternalLinkIcon } from '@krowten/svelte-heroicons';
-	import { labelByVaultStatus, labelByVaultType } from '../utils/renderer';
+	import { bgColorByVaultStatus, labelByVaultStatus, labelByVaultType } from '../utils/renderer';
 	import { getExplorerAddressUrl, trimAddress } from '../utils/data';
+
+	import { tooltip } from '@svelte-plugins/tooltips';
 
 	export let data: VaultData;
 	let className = '';
 	export { className as class };
 
-	const { type, asset, status, amount, amountUSD, address: oAddress } = data;
+	const { vaultNo, type, asset, status, amount, amountUSD, address: oAddress } = data;
 	const addr = FP.pipe(
 		oAddress,
 		O.getOrElse(() => '')
@@ -26,10 +28,25 @@
 
 <div class="flex flex-col items-center rounded-lg bg-gray-50 {className}">
 	<div
-		class="w-full rounded-t-lg bg-gray-100 py-3 px-2 text-center text-xs uppercase  text-gray-500"
+		class="w-full cursor-default rounded-t-lg bg-gray-100 py-3 px-2 text-center text-xs uppercase  text-gray-500"
+		use:tooltip={{
+			content: `${labelByVaultStatus(status).toUpperCase()} ${labelByVaultType(
+				type
+			).toUpperCase()}`,
+			style: {
+				backgroundColor: '#6b7280',
+				padding: '0.5em',
+				textTransform: 'uppercase',
+				arrowSize: '0.5em',
+				fontSize: '1em'
+			},
+			animation: 'slide'
+		}}
 	>
-		{labelByVaultType(type)}
-		<span class="lower-case">({labelByVaultStatus(status)})</span>
+		<div class="flex w-full items-center justify-center">
+			<span class="{bgColorByVaultStatus(status)} mr-1 block h-2 w-2 rounded-full" />
+			{labelByVaultType(type)} #{vaultNo}
+		</div>
 	</div>
 	<div class="pt-4 text-xl leading-none text-gray-600">
 		{formatAssetAmountCurrency({

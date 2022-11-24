@@ -45,6 +45,7 @@ import {
 	monoidAssetAmount,
 	monoidBaseAmount,
 	ordVaultDataByTypeStatusReverse,
+	ordVaultDataByVaultNoReverse,
 	sequenceSOption,
 	unionString
 } from './fp';
@@ -181,9 +182,11 @@ const toVaultType = (type: VaultTypeEnum): VaultType => {
 };
 
 const toVaultData = ({
+	vaultNo,
 	vault,
 	poolsData
 }: {
+	vaultNo: number;
 	vault: Vault;
 	poolsData: PoolsDataMap;
 }): VaultData[] =>
@@ -202,6 +205,7 @@ const toVaultData = ({
 						);
 
 					const vaultData: VaultData = {
+						vaultNo,
 						asset,
 						address: getAddress(vault.addresses, asset.chain),
 						amount,
@@ -229,7 +233,7 @@ export const toVaultList = ({
 	FP.pipe(
 		vaults,
 		// get VaultData
-		A.map((vault: Vault) => toVaultData({ vault, poolsData })),
+		A.mapWithIndex((i, vault: Vault) => toVaultData({ vault, poolsData, vaultNo: i + 1 })),
 		A.flatten,
 		// ignore zero balances
 		A.filter(({ amount }: VaultData) => amount.gt(baseAmount(0))),
@@ -256,7 +260,11 @@ export const toVaultList = ({
 		// sort data
 		A.map<VaultListData, VaultListData>((v) => ({
 			...v,
-			data: FP.pipe(v.data, A.sort(ordVaultDataByTypeStatusReverse))
+			data: FP.pipe(
+				v.data,
+				A.sort(ordVaultDataByVaultNoReverse),
+				A.sort(ordVaultDataByTypeStatusReverse)
+			)
 		}))
 	);
 
@@ -287,17 +295,18 @@ export const toNodesVaultList = ({
 
 	const vaultData = FP.pipe(
 		members,
-		A.filterMap((member) => {
+		A.filterMapWithIndex((i, member) => {
 			const oNodeData = O.fromNullable(nodesData.get(member));
 			const oAsset = O.fromNullable(assetFromString('THOR.RUNE'));
 			return FP.pipe(
 				sequenceSOption({ node: oNodeData, asset: oAsset }),
 				O.map<{ node: NodesData; asset: Asset }, VaultData>(
 					({ node: { nodeAddress, bondAmount, nodeStatus }, asset }) => ({
+						vaultNo: i + 1,
 						asset,
 						address: O.some(nodeAddress),
 						amount: bondAmount,
-						type: 'bond',
+						type: 'node',
 						status: nodeStatus,
 						amountUSD: O.some(
 							baseToAsset(bondAmount).times(assetAmount(runeUSDPrice, THORNODE_DECIMAL))

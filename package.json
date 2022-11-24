@@ -13,6 +13,7 @@
 		"deploy": "npm run build && npx gh-pages -d dist"
 	},
 	"devDependencies": {
+		"@svelte-plugins/tooltips": "^0.1.6",
 		"@sveltejs/vite-plugin-svelte": "^1.1.0",
 		"@tsconfig/svelte": "^3.0.0",
 		"@typescript-eslint/eslint-plugin": "^5.42.1",
