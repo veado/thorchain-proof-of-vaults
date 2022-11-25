@@ -21,7 +21,6 @@
 		AssetLTC,
 		AssetRuneB1A,
 		AssetRuneNative,
-		assetToString,
 		AVAXChain,
 		BNBChain,
 		eqAsset,

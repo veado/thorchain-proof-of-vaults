@@ -207,14 +207,14 @@ export const loadAllData = async () =>
 	FP.pipe(
 		// pending
 		dataRD$$.set(RD.pending),
-		// () =>
-		// 	sequenceSTaskEither({
-		// 		asgards: loadAsgards(),
-		// 		yggs: loadYggs(),
-		// 		pools: loadPools(),
-		// 		nodes: loadNodes(),
-		// 		stats: loadStats()
-		// 	}),
+		() =>
+			sequenceSTaskEither({
+				asgards: loadAsgards(),
+				yggs: loadYggs(),
+				pools: loadPools(),
+				nodes: loadNodes(),
+				stats: loadStats()
+			}),
 		// () =>
 		// 	sequenceSTaskEither({
 		// 		asgards: loadAsgardsJSON('churn-8231550'),
@@ -223,14 +223,14 @@ export const loadAllData = async () =>
 		// 		nodes: loadNodesJSON('churn-8231550'),
 		// 		stats: loadStatsJSON('churn-8231550')
 		// 	}),
-		() =>
-			sequenceSTaskEither({
-				asgards: loadAsgardsJSON('8295828'),
-				yggs: loadYggsJSON('8295828'),
-				pools: loadPoolsJSON('8295828'),
-				nodes: loadNodesJSON('8295828'),
-				stats: loadStatsJSON('8295828')
-			}),
+		// () =>
+		// 	sequenceSTaskEither({
+		// 		asgards: loadAsgardsJSON('8295828'),
+		// 		yggs: loadYggsJSON('8295828'),
+		// 		pools: loadPoolsJSON('8295828'),
+		// 		nodes: loadNodesJSON('8295828'),
+		// 		stats: loadStatsJSON('8295828')
+		// 	}),
 		(seq) =>
 			seq().then(
 				E.fold(

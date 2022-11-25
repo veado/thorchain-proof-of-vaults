@@ -93,11 +93,3 @@ export const ordVaultDataByTypeStatus: Ord.Ord<VaultData> = Ord.fromCompare((x, 
 );
 export const ordVaultDataByTypeStatusReverse: Ord.Ord<VaultData> =
 	Ord.reverse(ordVaultDataByTypeStatus);
-
-const getOrdVaultDataValueByVaultNo = ({ vaultNo }: VaultData): number => vaultNo;
-
-export const ordVaultDataByVaultNo: Ord.Ord<VaultData> = Ord.fromCompare((x, y) =>
-	N.Ord.compare(getOrdVaultDataValueByVaultNo(x), getOrdVaultDataValueByVaultNo(y))
-);
-export const ordVaultDataByVaultNoReverse: Ord.Ord<VaultData> =
-	Ord.reverse(ordVaultDataByTypeStatus);

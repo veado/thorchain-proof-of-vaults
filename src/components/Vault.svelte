@@ -7,8 +7,10 @@
 		assetFromString,
 		AssetRuneNative,
 		baseToAsset,
+		Chain,
 		eqAsset,
-		formatAssetAmountCurrency
+		formatAssetAmountCurrency,
+		type Address
 	} from '@xchainjs/xchain-util';
 	import { ExternalLinkIcon } from '@krowten/svelte-heroicons';
 	import {
@@ -22,7 +24,6 @@
 		getNoVaultsFromVaultMemberships,
 		trimAddress
 	} from '../utils/data';
-	import * as A from 'fp-ts/lib/Array';
 
 	import Tooltip from './Tooltip.svelte';
 
@@ -70,19 +71,13 @@
 		return tooltip;
 	};
 
-	const membersShorten = () =>
-		FP.pipe(
-			members,
-			A.reduce('', (acc, member) => (member ? `${acc} .${member.slice(-4) || member}` : acc))
-		);
-
 	const hasMembers = type !== 'node' && members.length;
 
 	const membersLabel = hasMembers
 		? `Managed by ${members.length} ${plural('node', members.length)}`
 		: '';
 
-	const onClickAddress = (address, chain) => {
+	const onClickAddress = (address: Address, chain: Chain) => {
 		const url = getExplorerAddressUrl(chain, address);
 		window.open(url);
 	};

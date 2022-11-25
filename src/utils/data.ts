@@ -45,7 +45,6 @@ import {
 	monoidAssetAmount,
 	monoidBaseAmount,
 	ordVaultDataByTypeStatusReverse,
-	ordVaultDataByVaultNoReverse,
 	sequenceSOption,
 	unionString
 } from './fp';
@@ -311,11 +310,7 @@ export const toVaultList = ({
 		// sort data
 		A.map<VaultListData, VaultListData>((v) => ({
 			...v,
-			data: FP.pipe(
-				v.data,
-				A.sort(ordVaultDataByVaultNoReverse),
-				A.sort(ordVaultDataByTypeStatusReverse)
-			)
+			data: FP.pipe(v.data, A.sort(ordVaultDataByTypeStatusReverse))
 		}))
 	);
 
