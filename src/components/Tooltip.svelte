@@ -13,7 +13,7 @@
 	export { className as class };
 	let classNamePopup = '';
 	export { classNamePopup as classPopup };
-	export let tooltip;
+	export let tooltip = '';
 
 	let showTooltip = false;
 </script>
@@ -27,46 +27,22 @@
 >
 	<slot />
 </div>
-{#if showTooltip && tooltip}
+{#if showTooltip}
 	<div
 		transition:fade={{ duration: 200 }}
-		class="relative bg-gray-400 text-xs uppercase text-gray-50 {classNamePopup}"
+		class="relative bg-gray-400 text-xs uppercase text-gray-50  {classNamePopup}"
 		use:popperContent={extraOpts}
 	>
-		<!-- Note: padding needs to be here to position arrow properly -->
-		<div class="px-2 py-1">{tooltip}</div>
-		<!-- arrow -->
+		<!--
+      tooltip content can be replaced by adding another content to this slot
+      e.g. <div `slot="tooltip">...</div>`
+      see `Vault.svelte`
+    -->
+		<slot name="tooltip"><div class="px-2 py-1">{tooltip}</div></slot>
+
 		<div
 			class="invisible absolute h-2 w-2 bg-inherit after:visible after:absolute after:h-2 after:w-2 after:translate-y-[-50%] after:rotate-45 after:bg-inherit after:content-['']"
 			data-popper-arrow
 		/>
 	</div>
 {/if}
-
-<style>
-	#tooltip {
-		background: #333;
-		color: white;
-		font-weight: bold;
-		padding: 4px 8px;
-		font-size: 13px;
-		border-radius: 4px;
-	}
-	#arrow,
-	#arrow::before {
-		position: absolute;
-		width: 8px;
-		height: 8px;
-		background: inherit;
-	}
-
-	#arrow {
-		visibility: hidden;
-	}
-
-	#arrow::before {
-		visibility: visible;
-		content: '';
-		transform: rotate(45deg);
-	}
-</style>

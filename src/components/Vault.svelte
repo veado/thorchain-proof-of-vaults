@@ -3,7 +3,13 @@
 	import * as FP from 'fp-ts/lib/function';
 	import * as O from 'fp-ts/lib/Option';
 	import { sequenceSOption } from '../utils/fp';
-	import { assetFromString, baseToAsset, formatAssetAmountCurrency } from '@xchainjs/xchain-util';
+	import {
+		assetFromString,
+		AssetRuneNative,
+		baseToAsset,
+		eqAsset,
+		formatAssetAmountCurrency
+	} from '@xchainjs/xchain-util';
 	import { ExternalLinkIcon } from '@krowten/svelte-heroicons';
 	import { bgColorByVaultStatus, labelByVaultStatus, labelByVaultType } from '../utils/renderer';
 	import { getExplorerAddressUrl, trimAddress } from '../utils/data';
@@ -14,7 +20,7 @@
 	let className = '';
 	export { className as class };
 
-	const { vaultNo, type, asset, status, amount, amountUSD, address: oAddress } = data;
+	const { id, type, asset, status, amount, amountUSD, address: oAddress } = data;
 	const addr = FP.pipe(
 		oAddress,
 		O.getOrElse(() => '')
@@ -29,12 +35,24 @@
 <div class="flex flex-col items-center rounded-lg bg-gray-50 {className}">
 	<Tooltip
 		class="flex w-full cursor-default items-center justify-center rounded-t-lg bg-gray-100 py-3 px-2 text-center text-xs uppercase text-gray-500"
-		tooltip={`${labelByVaultStatus(status)} ${labelByVaultType(type)} #${vaultNo}`}
 	>
 		<!-- status icon -->
 		<span class="{bgColorByVaultStatus(status)} mr-1 block h-2 w-2 rounded-full" />
 		<!-- status label -->
-		{labelByVaultType(type)} #{vaultNo}
+		{labelByVaultType(type)}
+		<!--
+      Custom tooltip content
+		  Note: fragment is need to define @const only
+      in other case `<div slot="tooltip">...</div> would just work w/o an outher fragment
+    -->
+		<svelte:fragment slot="tooltip">
+			{@const vaultId = eqAsset(asset, AssetRuneNative) ? addr : id}
+			<div class="px-2 py-1">
+				{labelByVaultStatus(status)}
+				{labelByVaultType(type)}<span class="ml-1 normal-case">.{vaultId.slice(-4) || vaultId}</span
+				>
+			</div>
+		</svelte:fragment>
 	</Tooltip>
 	<div class="pt-4 text-xl leading-none text-gray-600">
 		{formatAssetAmountCurrency({
