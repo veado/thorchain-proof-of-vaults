@@ -8,7 +8,7 @@
 	import { bgColorByVaultStatus, labelByVaultStatus, labelByVaultType } from '../utils/renderer';
 	import { getExplorerAddressUrl, trimAddress } from '../utils/data';
 
-	import { tooltip } from '@svelte-plugins/tooltips';
+	import Tooltip from './Tooltip.svelte';
 
 	export let data: VaultData;
 	let className = '';
@@ -27,27 +27,15 @@
 </script>
 
 <div class="flex flex-col items-center rounded-lg bg-gray-50 {className}">
-	<div
-		class="w-full cursor-default rounded-t-lg bg-gray-100 py-3 px-2 text-center text-xs uppercase  text-gray-500"
-		use:tooltip={{
-			content: `${labelByVaultStatus(status).toUpperCase()} ${labelByVaultType(
-				type
-			).toUpperCase()}`,
-			style: {
-				backgroundColor: '#6b7280',
-				padding: '0.5em',
-				textTransform: 'uppercase',
-				arrowSize: '0.5em',
-				fontSize: '1em'
-			},
-			animation: 'slide'
-		}}
+	<Tooltip
+		class="flex w-full cursor-default items-center justify-center rounded-t-lg bg-gray-100 py-3 px-2 text-center text-xs uppercase text-gray-500"
+		tooltip={`${labelByVaultStatus(status)} ${labelByVaultType(type)} #${vaultNo}`}
 	>
-		<div class="flex w-full items-center justify-center">
-			<span class="{bgColorByVaultStatus(status)} mr-1 block h-2 w-2 rounded-full" />
-			{labelByVaultType(type)} #{vaultNo}
-		</div>
-	</div>
+		<!-- status icon -->
+		<span class="{bgColorByVaultStatus(status)} mr-1 block h-2 w-2 rounded-full" />
+		<!-- status label -->
+		{labelByVaultType(type)} #{vaultNo}
+	</Tooltip>
 	<div class="pt-4 text-xl leading-none text-gray-600">
 		{formatAssetAmountCurrency({
 			amount: baseToAsset(amount),
