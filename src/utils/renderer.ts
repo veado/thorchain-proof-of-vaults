@@ -60,3 +60,5 @@ export const VAULT_SORT_LABEL_MAP: Record<VaultSort, string /* label*/> = {
 	name: 'Asset ↓',
 	nameRev: 'Asset ↑'
 };
+
+export const plural = (word: string, n: number) => (n > 1 ? `${word}s` : word);

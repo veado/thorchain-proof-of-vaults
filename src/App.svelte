@@ -7,7 +7,6 @@
 		dataRD$,
 		loadAllData,
 		vaultsSorted$ as vaults$,
-		pools$,
 		timeLeft$,
 		autoReload$$,
 		vaultSort$$,
@@ -25,7 +24,6 @@
 	import NoResults from './components/NoResults.svelte';
 	import * as FP from 'fp-ts/lib/function';
 	import Error from './components/Error.svelte';
-	import GithubIcon from './components/GithubIcon.svelte';
 	import Footer from './components/Footer.svelte';
 
 	$: loading = RD.isPending($dataRD$);
@@ -38,8 +36,6 @@
 			() => ''
 		)
 	);
-
-	$: emptyData = $vaults$.length <= 0 || $pools$.size <= 0;
 
 	const onSearchHandler = ({ detail: search }: CustomEvent<string>) => {
 		vaultSearch$$.set(search);

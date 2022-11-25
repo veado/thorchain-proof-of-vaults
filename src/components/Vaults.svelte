@@ -14,8 +14,8 @@
 		AssetRuneNative
 	} from '@xchainjs/xchain-util';
 
-	import { pools$ } from '../stores/store';
-	import { getNoVaults, getPoolStatus } from '../utils/data';
+	import { pools$, totalNoAsgard$, totalNoYggs$ } from '../stores/store';
+	import { getNoVaultsFromVaultData, getPoolStatus } from '../utils/data';
 
 	import AssetIcon from './AssetIcon.svelte';
 	import LoaderIcon from './LoaderIcon.svelte';
@@ -53,9 +53,9 @@
 
 	const { asset, data, total, totalUSD, assetPriceUSD } = item;
 
-	const noAsgards = getNoVaults('asgard', data);
-	const noYggs = getNoVaults('ygg', data);
-	const noNodes = getNoVaults('node', data);
+	const noAsgards = getNoVaultsFromVaultData('asgard', data);
+	const noYggs = getNoVaultsFromVaultData('ygg', data);
+	const noNodes = getNoVaultsFromVaultData('node', data);
 </script>
 
 <!-- vaults wrapper -->
@@ -134,12 +134,12 @@
 		<!-- vaults content -->
 		<div class="flex flex-col items-center">
 			{#if eqAsset(asset, AssetRuneNative)}
-				<div class="mb-0.5 text-sm uppercase text-gray-400 lg:mb-1">Bonded by</div>
-				<div class="text-base uppercase text-gray-500 lg:text-base xl:text-lg">
+				<div class="text-sm uppercase text-gray-400">Bonded by</div>
+				<div class="text-base uppercase text-gray-500 lg:text-base xl:text-xl">
 					{noNodes} Nodes
 				</div>
-				<div class="mt-1 text-sm uppercase text-gray-400 lg:px-3 ">
-					to manage XX Asgards and XX Yggdrasils
+				<div class="text-sm uppercase text-gray-400 lg:px-3">
+					to manage {$totalNoAsgard$} Asgards and {$totalNoYggs$} Yggdrasils
 				</div>
 			{:else}
 				{@const poolStatus = getPoolStatus(asset, $pools$)}

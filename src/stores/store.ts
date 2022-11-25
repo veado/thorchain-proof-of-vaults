@@ -30,7 +30,9 @@ import {
 	toNodesDataMap,
 	toVaultList,
 	toReadable,
-	toNodesVaultList
+	toNodesVaultList,
+	toVaults,
+	getNoVaultsFromVaultList
 } from '../utils/data';
 import type * as Ord from 'fp-ts/lib/Ord';
 import { assetToString, bnOrZero } from '@xchainjs/xchain-util';
@@ -55,6 +57,14 @@ export const vaults$: Readable<VaultList> = derived(dataRD$, (dataRD) =>
 		}),
 		RD.getOrElse(() => get(_vaults))
 	)
+);
+
+export const totalNoAsgard$: Readable<number> = derived(vaults$, (vaults) =>
+	getNoVaultsFromVaultList('asgard', vaults)
+);
+
+export const totalNoYggs$: Readable<number> = derived(vaults$, (vaults) =>
+	getNoVaultsFromVaultList('ygg', vaults)
 );
 
 const VAULT_SORT_MAP: Record<VaultSort, Ord.Ord<VaultListData>> = {
@@ -230,21 +240,27 @@ export const loadAllData = async () =>
 					({ asgards, yggs, pools, nodes, stats }) => {
 						const poolsDataMap = toPoolsDataMap(pools);
 
-						const asgardYggsList = toVaultList({
-							vaults: [...asgards, ...yggs],
-							poolsData: poolsDataMap
-						});
-						const runeUSDPrice = bnOrZero(stats.runePriceUSD);
+						const asgardYggsVaults = toVaults([...asgards, ...yggs]);
+
 						const nodesDataMap = toNodesDataMap(nodes);
-						const nodeVaultList = toNodesVaultList({
-							vaults: [...asgards, ...yggs],
-							runeUSDPrice,
+
+						const asgardYggsList = toVaultList({
+							vaults: asgardYggsVaults,
+							poolsData: poolsDataMap,
 							nodesData: nodesDataMap
+						});
+
+						const runeUSDPrice = bnOrZero(stats.runePriceUSD);
+
+						const nodeVaultList = toNodesVaultList({
+							vaults: asgardYggsVaults,
+							nodesData: nodesDataMap,
+							runeUSDPrice
 						});
 
 						const vaults = [...asgardYggsList, ...nodeVaultList];
 
-						dataRD$$.set(RD.success({ vaults, pools: poolsDataMap, nodes }));
+						dataRD$$.set(RD.success({ vaults, pools: poolsDataMap }));
 					}
 				)
 			)

@@ -11,8 +11,8 @@
 
 	let className = '';
 	export { className as class };
-	let classNamePopup = '';
-	export { classNamePopup as classPopup };
+	let classNameTooltip = '';
+	export { classNameTooltip as classTooltip };
 	export let tooltip = '';
 
 	let showTooltip = false;
@@ -30,7 +30,7 @@
 {#if showTooltip}
 	<div
 		transition:fade={{ duration: 200 }}
-		class="relative bg-gray-400 text-xs uppercase text-gray-50  {classNamePopup}"
+		class="relative bg-gray-400 text-xs uppercase text-gray-50 {classNameTooltip}"
 		use:popperContent={extraOpts}
 	>
 		<!--
