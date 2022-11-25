@@ -14,8 +14,8 @@
 		AssetRuneNative
 	} from '@xchainjs/xchain-util';
 
-	import { pools$ } from '../stores/store';
-	import { getNoVaults, getPoolStatus } from '../utils/data';
+	import { pools$, totalNoAsgard$, totalNoYggs$ } from '../stores/store';
+	import { getNoVaultsFromVaultData, getPoolStatus } from '../utils/data';
 
 	import AssetIcon from './AssetIcon.svelte';
 	import LoaderIcon from './LoaderIcon.svelte';
@@ -53,9 +53,9 @@
 
 	const { asset, data, total, totalUSD, assetPriceUSD } = item;
 
-	const noAsgards = getNoVaults('asgard', data);
-	const noYggs = getNoVaults('ygg', data);
-	const noNodes = getNoVaults('bond', data);
+	const noAsgards = getNoVaultsFromVaultData('asgard', data);
+	const noYggs = getNoVaultsFromVaultData('ygg', data);
+	const noNodes = getNoVaultsFromVaultData('node', data);
 </script>
 
 <!-- vaults wrapper -->
@@ -132,26 +132,37 @@
 		</div>
 
 		<!-- vaults content -->
-		<div class="flex items-center">
+		<div class="flex flex-col items-center">
 			{#if eqAsset(asset, AssetRuneNative)}
-				<div class="px-2 text-sm uppercase text-gray-500 lg:px-3 lg:text-base xl:text-lg">
+				<div class="text-sm uppercase text-gray-400">Bonded by</div>
+				<div class="text-base uppercase text-gray-500 lg:text-base xl:text-xl">
 					{noNodes} Nodes
 				</div>
-			{:else}
-				<div class="px-2 text-sm uppercase text-gray-500 lg:px-3 lg:text-base xl:text-lg">
-					{noAsgards} Asgards
+				<div class="text-sm uppercase text-gray-400 lg:px-3">
+					to manage {$totalNoAsgard$} Asgards and {$totalNoYggs$} Yggdrasils
 				</div>
-				{#if noYggs > 0}
-					<div
-						class="border-l border-gray-400 px-3 text-sm uppercase text-gray-500 lg:text-base xl:text-lg"
-					>
-						{noYggs} Yggdrasils
+			{:else}
+				{@const poolStatus = getPoolStatus(asset, $pools$)}
+				<div class="mb-0.5 text-sm  uppercase text-gray-400 lg:mb-1">Distributed by</div>
+				<div class="flex items-center">
+					<div class="px-3 text-sm uppercase text-gray-500 lg:text-base xl:text-lg">
+						{noAsgards} Asgards
 					</div>
-				{/if}
-				<div
-					class="border-l border-gray-400 px-3 text-sm uppercase  text-gray-500 lg:text-base xl:text-lg"
-				>
-					{labelByPoolStatus(getPoolStatus(asset, $pools$))} pool
+					{#if noYggs > 0}
+						<div
+							class="border-l border-gray-400 px-3 text-sm uppercase text-gray-500 lg:text-base xl:text-lg"
+						>
+							{noYggs} Yggdrasils
+						</div>
+					{/if}
+					<div
+						class="border-l border-gray-400 px-3 text-sm uppercase  text-gray-500 lg:text-base xl:text-lg"
+					>
+						{#if poolStatus !== 'unknown'}
+							1
+						{/if}
+						{labelByPoolStatus(poolStatus)} pool
+					</div>
 				</div>
 			{/if}
 		</div>

@@ -1,13 +1,10 @@
 import { getAddress as ethGetAddr } from '@ethersproject/address';
 import BigNumber from 'bignumber.js';
 
-import type {
-	Node,
-	NodeStatusEnum,
-	Vault,
-	VaultAddress,
-	VaultTypeEnum
-} from '@xchainjs/xchain-thornode';
+import type * as TN from '@xchainjs/xchain-thornode';
+
+import { v4 as uuidv4 } from 'uuid';
+
 import {
 	Chain,
 	baseAmount,
@@ -33,9 +30,12 @@ import type {
 	NodesDataMap,
 	PoolsDataMap,
 	PoolStatus,
+	Vault,
 	VaultData,
 	VaultList,
 	VaultListData,
+	VaultMembers,
+	VaultMemberships,
 	VaultStatus,
 	VaultType
 } from 'src/types/types';
@@ -74,17 +74,32 @@ export const convertBaseAmountDecimal = (amount: BaseAmount, decimal: number): B
 /** Helper to convert Writable -> Readable */
 export const toReadable = <T>(v$$: Writable<T>): Readable<T> => derived(v$$, FP.identity);
 
-export const toNodesDataMap = (nodes: Node[]): NodesDataMap =>
+export const toVaults = (vaults: TN.Vault[]): Vault[] =>
+	FP.pipe(
+		vaults,
+		A.map((vault) => ({
+			id: vault?.pub_key ?? uuidv4(),
+			member: vault?.membership ?? [],
+			type: toVaultType(vault?.type),
+			addresses: vault.addresses,
+			status: (vault?.status ?? 'unknown') as VaultStatus,
+			coins: vault.coins,
+			members: vault?.membership ?? []
+		}))
+	);
+
+export const toNodesDataMap = (nodes: TN.Node[]): NodesDataMap =>
 	FP.pipe(
 		nodes,
-		A.reduce<Node, NodesDataMap>(new Map(), (acc, cur: Node) => {
-			const sec = cur.pub_key_set.secp256k1;
-			if (sec) {
+		A.reduce<TN.Node, NodesDataMap>(new Map(), (acc, cur: TN.Node) => {
+			const pubKeySecp256k1 = cur.pub_key_set.secp256k1;
+			if (pubKeySecp256k1) {
 				const bondAmount = baseAmount(cur.bond, THORNODE_DECIMAL);
-				return acc.set(sec, {
+				return acc.set(pubKeySecp256k1, {
 					bondAmount,
 					nodeStatus: cur.status,
-					bondAddress: cur.bond_address
+					nodeAddress: cur.node_address,
+					pubKeySecp256k1
 				});
 			} else {
 				return acc;
@@ -92,7 +107,7 @@ export const toNodesDataMap = (nodes: Node[]): NodesDataMap =>
 		})
 	);
 
-export const filterNodes = (nodes: Node[], status: NodeStatusEnum) =>
+export const filterNodes = (nodes: TN.Node[], status: TN.NodeStatusEnum) =>
 	FP.pipe(
 		nodes,
 		A.filter((node) => node.status === status)
@@ -124,14 +139,7 @@ export const toPoolsDataMap = (pools: PoolDetails): PoolsDataMap =>
 		)
 	);
 
-export const getTotalBonds = (members: Address[], nodes: NodesDataMap): BaseAmount =>
-	FP.pipe(
-		members,
-		A.filterMap((member: string) => O.fromNullable(nodes.get(member).bondAmount)),
-		A.reduce(baseAmount(0, THORNODE_DECIMAL), (acc, cur: BaseAmount) => acc.plus(cur))
-	);
-
-export const getAddress = (addresses: VaultAddress[], chain: string): O.Option<Address> =>
+export const getAddress = (addresses: TN.VaultAddress[], chain: string): O.Option<Address> =>
 	FP.pipe(
 		addresses,
 		A.findFirst(({ chain: c, address }) => c === chain && !!address),
@@ -178,21 +186,54 @@ export const getPoolStatus = (asset: Asset, poolsData: PoolsDataMap): PoolStatus
 		O.getOrElse(() => 'unknown')
 	);
 
-const toVaultType = (type: VaultTypeEnum): VaultType => {
+const toVaultType = (type?: TN.VaultTypeEnum): VaultType => {
 	switch (type) {
 		case 'AsgardVault':
 			return 'asgard';
 		case 'YggdrasilVault':
 			return 'ygg';
+		default:
+			return 'unknown';
 	}
 };
 
+const toVaultMembers = ({
+	members,
+	nodesData
+}: {
+	members: string[];
+	nodesData: NodesDataMap;
+}): VaultMembers =>
+	FP.pipe(
+		members,
+		A.filterMap((member) =>
+			FP.pipe(
+				nodesData.get(member),
+				O.fromNullable,
+				O.map((data) => data.nodeAddress)
+			)
+		)
+	);
+
+const toNodeMemberships = (pubKeySecp256k1: string, vaults: Vault[]): VaultMemberships =>
+	FP.pipe(
+		vaults,
+		A.reduce([], (acc, curr: Vault) => {
+			if (curr.members.includes(pubKeySecp256k1)) {
+				return [...acc, { type: curr.type, address: curr.id }];
+			}
+			return acc;
+		})
+	);
+
 const toVaultData = ({
 	vault,
-	poolsData
+	poolsData,
+	nodesData
 }: {
 	vault: Vault;
 	poolsData: PoolsDataMap;
+	nodesData: NodesDataMap;
 }): VaultData[] =>
 	FP.pipe(
 		vault.coins || [], // Important note: coins can be null while churning!
@@ -208,14 +249,20 @@ const toVaultData = ({
 							getDecimal(asset, poolsData)
 						);
 
-					return {
+					const type = vault.type;
+					const vaultData: VaultData = {
+						id: vault.id,
 						asset,
 						address: getAddress(vault.addresses, asset.chain),
 						amount,
 						amountUSD: getPrice({ asset, amount, poolsData }),
-						type: vault.type ? toVaultType(vault.type) : 'unknown',
-						status: (vault?.status ?? 'unknown') as VaultStatus
+						type,
+						status: (vault?.status ?? 'unknown') as VaultStatus,
+						members: toVaultMembers({ members: vault.members, nodesData }),
+						memberships: []
 					};
+
+					return vaultData;
 				})
 			);
 		})
@@ -226,15 +273,17 @@ const toVaultData = ({
  */
 export const toVaultList = ({
 	vaults,
-	poolsData
+	poolsData,
+	nodesData
 }: {
 	vaults: Vault[];
 	poolsData: PoolsDataMap;
+	nodesData: NodesDataMap;
 }): VaultList =>
 	FP.pipe(
 		vaults,
 		// get VaultData
-		A.map((vault: Vault) => toVaultData({ vault, poolsData })),
+		A.map((vault: Vault) => toVaultData({ vault, poolsData, nodesData })),
 		A.flatten,
 		// ignore zero balances
 		A.filter(({ amount }: VaultData) => amount.gt(baseAmount(0))),
@@ -281,7 +330,7 @@ export const toNodesVaultList = ({
 		vaults,
 		A.map((vault: Vault) =>
 			FP.pipe(
-				vault.membership,
+				vault.members,
 				A.reduce([], (acc, member) => (member ? [...acc, member] : acc))
 			)
 		),
@@ -298,15 +347,18 @@ export const toNodesVaultList = ({
 			return FP.pipe(
 				sequenceSOption({ node: oNodeData, asset: oAsset }),
 				O.map<{ node: NodesData; asset: Asset }, VaultData>(
-					({ node: { bondAddress, bondAmount, nodeStatus }, asset }) => ({
+					({ node: { nodeAddress, bondAmount, nodeStatus, pubKeySecp256k1 }, asset }) => ({
+						id: pubKeySecp256k1,
 						asset,
-						address: O.some(bondAddress),
+						address: O.some(nodeAddress),
 						amount: bondAmount,
-						type: 'bond',
+						type: 'node',
 						status: nodeStatus,
 						amountUSD: O.some(
 							baseToAsset(bondAmount).times(assetAmount(runeUSDPrice, THORNODE_DECIMAL))
-						)
+						),
+						memberships: toNodeMemberships(pubKeySecp256k1, vaults),
+						members: []
 					})
 				)
 			);
@@ -367,9 +419,33 @@ export const getEthTokenAddress = (asset: Asset): Address =>
 		ethGetAddr
 	);
 
-export const getNoVaults = (type: VaultType, list: VaultData[]): number =>
+export const getNoVaultsFromVaultList = (type: VaultType, list: VaultList): number =>
 	FP.pipe(
 		list,
+		A.map(({ data }) =>
+			FP.pipe(
+				data,
+				A.filter((d) => d.type === type)
+			)
+		),
+		A.flatten,
+		A.map(({ id }) => id),
+		(vaults) => unionString(vaults)(vaults),
+		(vaults) => vaults.length
+	);
+
+export const getNoVaultsFromVaultData = (type: VaultType, list: VaultData[]): number =>
+	FP.pipe(
+		list,
+		A.reduce(0, (acc, curr) => (curr.type === type ? acc + 1 : acc))
+	);
+
+export const getNoVaultsFromVaultMemberships = (
+	type: VaultType,
+	members: VaultMemberships
+): number =>
+	FP.pipe(
+		members,
 		A.reduce(0, (acc, curr) => (curr.type === type ? acc + 1 : acc))
 	);
 
@@ -391,7 +467,7 @@ export const getExplorerAddressUrl = (chain: Chain, address: Address) => {
 		case Chain.Cosmos:
 			return `https://cosmos.bigdipper.live/account/${address}`;
 		case Chain.THORChain:
-			return `https://thorchain.net/address/${address}`;
+			return `https://thorchain.net/node/${address}`;
 		case Chain.Ethereum:
 			return `https://etherscan.io/address/${address}`;
 	}

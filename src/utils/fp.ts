@@ -73,7 +73,7 @@ const getOrdVaultDataValueByTypeStatus = ({ type, status }: VaultData): number =
 	switch (type) {
 		case 'unknown':
 			return 0;
-		case 'bond':
+		case 'node':
 			if (status === 'Active') return 1;
 			if (status === 'Standby') return 2;
 			return 0;
