@@ -50,6 +50,7 @@ import {
 	unionString
 } from './fp';
 import { derived, type Readable, type Writable } from 'svelte/store';
+import { v4 as uuidv4 } from 'uuid';
 
 /**
  * Helper to convert decimals
@@ -79,13 +80,14 @@ export const toNodesDataMap = (nodes: Node[]): NodesDataMap =>
 	FP.pipe(
 		nodes,
 		A.reduce<Node, NodesDataMap>(new Map(), (acc, cur: Node) => {
-			const sec = cur.pub_key_set.secp256k1;
-			if (sec) {
+			const pubKeySecp256k1 = cur.pub_key_set.secp256k1;
+			if (pubKeySecp256k1) {
 				const bondAmount = baseAmount(cur.bond, THORNODE_DECIMAL);
-				return acc.set(sec, {
+				return acc.set(pubKeySecp256k1, {
 					bondAmount,
 					nodeStatus: cur.status,
-					nodeAddress: cur.node_address
+					nodeAddress: cur.node_address,
+					pubKeySecp256k1
 				});
 			} else {
 				return acc;
@@ -182,11 +184,9 @@ const toVaultType = (type: VaultTypeEnum): VaultType => {
 };
 
 const toVaultData = ({
-	vaultNo,
 	vault,
 	poolsData
 }: {
-	vaultNo: number;
 	vault: Vault;
 	poolsData: PoolsDataMap;
 }): VaultData[] =>
@@ -205,7 +205,7 @@ const toVaultData = ({
 						);
 
 					const vaultData: VaultData = {
-						vaultNo,
+						id: vault.pub_key || uuidv4(),
 						asset,
 						address: getAddress(vault.addresses, asset.chain),
 						amount,
@@ -233,7 +233,7 @@ export const toVaultList = ({
 	FP.pipe(
 		vaults,
 		// get VaultData
-		A.mapWithIndex((i, vault: Vault) => toVaultData({ vault, poolsData, vaultNo: i + 1 })),
+		A.map((vault: Vault) => toVaultData({ vault, poolsData })),
 		A.flatten,
 		// ignore zero balances
 		A.filter(({ amount }: VaultData) => amount.gt(baseAmount(0))),
@@ -295,14 +295,14 @@ export const toNodesVaultList = ({
 
 	const vaultData = FP.pipe(
 		members,
-		A.filterMapWithIndex((i, member) => {
+		A.filterMap((member) => {
 			const oNodeData = O.fromNullable(nodesData.get(member));
 			const oAsset = O.fromNullable(assetFromString('THOR.RUNE'));
 			return FP.pipe(
 				sequenceSOption({ node: oNodeData, asset: oAsset }),
 				O.map<{ node: NodesData; asset: Asset }, VaultData>(
-					({ node: { nodeAddress, bondAmount, nodeStatus }, asset }) => ({
-						vaultNo: i + 1,
+					({ node: { nodeAddress, bondAmount, nodeStatus, pubKeySecp256k1 }, asset }) => ({
+						id: pubKeySecp256k1,
 						asset,
 						address: O.some(nodeAddress),
 						amount: bondAmount,

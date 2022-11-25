@@ -44,6 +44,7 @@
 		"@xchainjs/xchain-util": "^0.11.0",
 		"buffer": "^6.0.3",
 		"fp-ts": "^2.13.1",
-		"tw-elements": "^1.0.0-alpha12"
+		"tw-elements": "^1.0.0-alpha12",
+		"uuid": "^9.0.0"
 	}
 }

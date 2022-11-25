@@ -14,7 +14,7 @@ export type VaultStatus =
 	| 'unknown';
 
 export type VaultData = {
-	vaultNo: number;
+	id: string;
 	asset: Asset;
 	address: O.Option<Address>;
 	amount: BaseAmount;
@@ -44,6 +44,7 @@ export type NodesData = {
 	bondAmount: BaseAmount;
 	nodeStatus: NodeStatusEnum;
 	nodeAddress: Address;
+	pubKeySecp256k1: string;
 };
 export type NodesDataMap = Map<Address, NodesData>;
 
