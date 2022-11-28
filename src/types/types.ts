@@ -73,7 +73,6 @@ export type PoolsData = {
 	asset: Asset;
 	status: PoolStatus;
 	assetPriceUSD: BigNumber;
-	runeDepth: BigNumber;
 	decimal: number;
 };
 

@@ -130,7 +130,6 @@ export const toPoolsDataMap = (pools: PoolDetails): PoolsDataMap =>
 							asset,
 							status: (cur.status || 'unknown') as PoolStatus,
 							assetPriceUSD: bnOrZero(cur.assetPriceUSD),
-							runeDepth: bnOrZero(cur.runeDepth),
 							decimal
 						});
 					}
@@ -419,13 +418,21 @@ export const getEthTokenAddress = (asset: Asset): Address =>
 		ethGetAddr
 	);
 
-export const getNoVaultsFromVaultList = (type: VaultType, list: VaultList): number =>
+export const getNoVaultsFromVaultList = ({
+	type,
+	list,
+	status
+}: {
+	type: VaultType;
+	list: VaultList;
+	status?: VaultStatus;
+}): number =>
 	FP.pipe(
 		list,
 		A.map(({ data }) =>
 			FP.pipe(
 				data,
-				A.filter((d) => d.type === type)
+				A.filter((d) => d.type === type && (status ? d.status === status : true))
 			)
 		),
 		A.flatten,

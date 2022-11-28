@@ -14,7 +14,7 @@
 		AssetRuneNative
 	} from '@xchainjs/xchain-util';
 
-	import { pools$, totalNoAsgard$, totalNoYggs$ } from '../stores/store';
+	import { pools$, noTotalAsgards$, noTotalYggs$ } from '../stores/store';
 	import { getNoVaultsFromVaultData, getPoolStatus } from '../utils/data';
 
 	import AssetIcon from './AssetIcon.svelte';
@@ -139,7 +139,7 @@
 					{noNodes} Nodes
 				</div>
 				<div class="text-center text-sm uppercase text-gray-400 lg:px-3">
-					to manage {$totalNoAsgard$} Asgards and {$totalNoYggs$} Yggdrasils
+					to manage {$noTotalAsgards$} Asgards and {$noTotalYggs$} Yggdrasils
 				</div>
 			{:else}
 				{@const poolStatus = getPoolStatus(asset, $pools$)}

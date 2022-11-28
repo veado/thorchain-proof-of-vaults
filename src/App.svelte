@@ -10,8 +10,11 @@
 		timeLeft$,
 		autoReload$$,
 		vaultSort$$,
-		vaultSearch$$
+		vaultSearch$$,
+		noRetiringAsgards$,
+		noActiveAsgards$
 	} from './stores/store';
+
 	import * as RD from '@devexperts/remote-data-ts';
 	import { onMount } from 'svelte';
 	import LoaderIcon from './components/LoaderIcon.svelte';
@@ -25,6 +28,7 @@
 	import * as FP from 'fp-ts/lib/function';
 	import Error from './components/Error.svelte';
 	import Footer from './components/Footer.svelte';
+	import MigrationStatus from './components/MigrationStatus.svelte';
 
 	$: loading = RD.isPending($dataRD$);
 	$: error = FP.pipe(
@@ -67,7 +71,7 @@
 	onMount(loadAllData);
 </script>
 
-<div class="flex flex-col px-5 md:px-10  xl:px-20">
+<div class="flex flex-col items-center px-5  md:px-10 xl:px-20">
 	<!-- logo + title -->
 	<header class="container flex flex-col items-center bg-gray-50 py-10">
 		<a href="https://thorchain.org/" class="">
@@ -117,6 +121,13 @@
 				</div>
 			</div>
 		</nav>
+		{#if $noRetiringAsgards$}
+			<MigrationStatus
+				noRetiringAsgards={$noRetiringAsgards$}
+				noActiveAsgards={$noActiveAsgards$}
+				class="w-full "
+			/>
+		{/if}
 
 		<!-- reload -->
 
@@ -124,7 +135,7 @@
 			<button
 				class="flex w-auto items-center rounded-full
            bg-gray-400 px-6 py-1 text-lg uppercase text-white
-            hover:bg-tc 
+            hover:bg-tc
          hover:shadow-lg {loading ? 'cursor-not-allowed' : 'cursor-pointer hover:scale-105'}
          ease
          "
