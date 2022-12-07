@@ -14,7 +14,7 @@
 		AssetRuneNative
 	} from '@xchainjs/xchain-util';
 
-	import { pools$, totalNoAsgard$, totalNoYggs$ } from '../stores/store';
+	import { pools$, noTotalAsgards$, noTotalYggs$ } from '../stores/store';
 	import { getNoVaultsFromVaultData, getPoolStatus } from '../utils/data';
 
 	import AssetIcon from './AssetIcon.svelte';
@@ -138,25 +138,25 @@
 				<div class="text-base uppercase text-gray-500 lg:text-base xl:text-xl">
 					{noNodes} Nodes
 				</div>
-				<div class="text-sm uppercase text-gray-400 lg:px-3">
-					to manage {$totalNoAsgard$} Asgards and {$totalNoYggs$} Yggdrasils
+				<div class="text-center text-sm uppercase text-gray-400 lg:px-3">
+					to manage {$noTotalAsgards$} Asgards and {$noTotalYggs$} Yggdrasils
 				</div>
 			{:else}
 				{@const poolStatus = getPoolStatus(asset, $pools$)}
 				<div class="mb-0.5 text-sm  uppercase text-gray-400 lg:mb-1">Distributed by</div>
-				<div class="flex items-center">
+				<div class="flex flex-col items-center md:flex-row">
 					<div class="px-3 text-sm uppercase text-gray-500 lg:text-base xl:text-lg">
 						{noAsgards} Asgards
 					</div>
 					{#if noYggs > 0}
 						<div
-							class="border-l border-gray-400 px-3 text-sm uppercase text-gray-500 lg:text-base xl:text-lg"
+							class="border-gray-400 px-3 text-sm uppercase text-gray-500 md:border-l lg:text-base xl:text-lg"
 						>
 							{noYggs} Yggdrasils
 						</div>
 					{/if}
 					<div
-						class="border-l border-gray-400 px-3 text-sm uppercase  text-gray-500 lg:text-base xl:text-lg"
+						class="border-gray-400 px-3 text-sm uppercase text-gray-500  md:border-l lg:text-base xl:text-lg"
 					>
 						{#if poolStatus !== 'unknown'}
 							1
@@ -170,7 +170,7 @@
 	<!-- toggle button -->
 	<div class="mt-5 flex justify-center xl:mt-10">
 		<button
-			class="ease rounded-full border-2 border-gray-400 bg-white p-2 text-gray-400 hover:scale-105 hover:border-tc hover:text-tc hover:shadow-lg lg:p-4 "
+			class="ease rounded-full border-2 border-gray-400 bg-white p-3 text-gray-400 hover:scale-105 hover:border-tc hover:text-tc hover:shadow-lg lg:p-4 "
 			on:click={toggleDetails}
 		>
 			<ChevronDoubleDownIcon class="h-4 w-4 lg:h-6 lg:w-6 {showDetails ? 'rotate-180' : ''}" />

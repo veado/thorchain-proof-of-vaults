@@ -10,8 +10,11 @@
 		timeLeft$,
 		autoReload$$,
 		vaultSort$$,
-		vaultSearch$$
+		vaultSearch$$,
+		noRetiringAsgards$,
+		noActiveAsgards$
 	} from './stores/store';
+
 	import * as RD from '@devexperts/remote-data-ts';
 	import { onMount } from 'svelte';
 	import LoaderIcon from './components/LoaderIcon.svelte';
@@ -25,6 +28,7 @@
 	import * as FP from 'fp-ts/lib/function';
 	import Error from './components/Error.svelte';
 	import Footer from './components/Footer.svelte';
+	import MigrationStatus from './components/MigrationStatus.svelte';
 
 	$: loading = RD.isPending($dataRD$);
 	$: error = FP.pipe(
@@ -67,7 +71,7 @@
 	onMount(loadAllData);
 </script>
 
-<div class="flex flex-col px-10 md:px-20">
+<div class="flex flex-col items-center px-5  md:px-10 xl:px-20">
 	<!-- logo + title -->
 	<header class="container flex flex-col items-center bg-gray-50 py-10">
 		<a href="https://thorchain.org/" class="">
@@ -79,18 +83,18 @@
 		</a>
 		<h1 class="mt-2 text-2xl uppercase text-gray-900">Proof Of Vaults</h1>
 	</header>
-	<div class="container flex min-w-[480px] flex-col bg-white shadow-md">
-		<nav class="w-full bg-gray-200 py-3 px-10 ">
+	<div class="container flex flex-col bg-white shadow-md">
+		<nav class="w-full bg-gray-200 py-5 px-5 md:px-10 ">
 			<!-- sort / search -->
 			<div class="flex flex-col items-center lg:flex-row">
-				<div class="flex items-center">
+				<div class="flex w-full flex-col items-center justify-center md:w-auto md:flex-row">
 					<VaultSortDropdown
-						class="w-[150px]"
+						class="w-full md:w-[150px]"
 						current={$vaultSort$$}
 						on:item-selected={({ detail }) => vaultSort$$.set(detail)}
 					/>
 					<SearchInput
-						class="ml-10 w-[300px]"
+						class="mt-2 ml-0 w-full md:mt-0 md:ml-10 md:w-[300px]"
 						placeholder="Search assets"
 						on:search={onSearchHandler}
 						on:change={onSearchHandler}
@@ -117,6 +121,13 @@
 				</div>
 			</div>
 		</nav>
+		{#if $noRetiringAsgards$}
+			<MigrationStatus
+				noRetiringAsgards={$noRetiringAsgards$}
+				noActiveAsgards={$noActiveAsgards$}
+				class="w-full "
+			/>
+		{/if}
 
 		<!-- reload -->
 
@@ -124,7 +135,7 @@
 			<button
 				class="flex w-auto items-center rounded-full
            bg-gray-400 px-6 py-1 text-lg uppercase text-white
-            hover:bg-tc 
+            hover:bg-tc
          hover:shadow-lg {loading ? 'cursor-not-allowed' : 'cursor-pointer hover:scale-105'}
          ease
          "
@@ -166,7 +177,7 @@
 			</div>
 		</div>
 
-		<main class="p-20 md:p-10">
+		<main class="p-5 md:p-10">
 			{#if error}
 				<Error {error} />
 			{/if}

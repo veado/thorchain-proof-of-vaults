@@ -82,12 +82,20 @@ export const vaults$: Readable<VaultList> = derived(dataRD$, (dataRD) =>
 	)
 );
 
-export const totalNoAsgard$: Readable<number> = derived(vaults$, (vaults) =>
-	getNoVaultsFromVaultList('asgard', vaults)
+export const noTotalAsgards$: Readable<number> = derived(vaults$, (vaults) =>
+	getNoVaultsFromVaultList({ type: 'asgard', list: vaults })
 );
 
-export const totalNoYggs$: Readable<number> = derived(vaults$, (vaults) =>
-	getNoVaultsFromVaultList('ygg', vaults)
+export const noActiveAsgards$: Readable<number> = derived(vaults$, (vaults) =>
+	getNoVaultsFromVaultList({ type: 'asgard', list: vaults, status: 'ActiveVault' })
+);
+
+export const noRetiringAsgards$: Readable<number> = derived(vaults$, (vaults) =>
+	getNoVaultsFromVaultList({ type: 'asgard', list: vaults, status: 'RetiringVault' })
+);
+
+export const noTotalYggs$: Readable<number> = derived(vaults$, (vaults) =>
+	getNoVaultsFromVaultList({ type: 'ygg', list: vaults })
 );
 
 const VAULT_SORT_MAP: Record<VaultSort, Ord.Ord<VaultListData>> = {
