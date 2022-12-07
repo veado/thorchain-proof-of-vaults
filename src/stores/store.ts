@@ -36,23 +36,20 @@ import {
 } from '../utils/data';
 import type * as Ord from 'fp-ts/lib/Ord';
 import { assetToString, bnOrZero } from '@xchainjs/xchain-util';
-import type { AxiosRequestConfig } from 'axios';
 import axios from 'axios';
 
-const _options: AxiosRequestConfig = {
-	...axios.defaults,
-	headers: { ...(axios.defaults?.headers.common ?? {}), 'x-client-id': `${APP_IDENTIFIER}` }
-};
-
-// axios.interceptors.request.use(
-// 	(config) => {
-// 		config.headers['x-client-id'] = `${APP_IDENTIFIER}`;
-// 		return config;
-// 	},
-// 	(error) => {
-// 		return Promise.reject(error);
-// 	}
-// );
+axios.interceptors.request.use(
+	(config) => {
+		const url = new URL(config.url);
+		if (url.host.includes('ninerealms')) {
+			config.headers['x-client-id'] = `${APP_IDENTIFIER}`;
+		}
+		return config;
+	},
+	(error) => {
+		return Promise.reject(error);
+	}
+);
 
 const midgardConfig = new MidgardConfig({ basePath: MIDGARD_URL });
 const midgardApi = new DefaultApi(midgardConfig);
@@ -159,7 +156,7 @@ export const timeLeft$: Readable<number> = derived(
 
 const loadAsgards = (): TE.TaskEither<Error, Vault[]> =>
 	FP.pipe(
-		TE.tryCatch(() => vaultsApi.asgard(undefined /* height */, options), E.toError),
+		TE.tryCatch(() => vaultsApi.asgard(undefined /* height */), E.toError),
 		TE.map(({ data }) => data)
 	);
 
@@ -171,7 +168,7 @@ const loadAsgardsJSON = (id: string): TE.TaskEither<Error, Vault[]> =>
 
 const loadYggs = (): TE.TaskEither<Error, Vault[]> =>
 	FP.pipe(
-		TE.tryCatch(() => vaultsApi.yggdrasil(undefined /* height */, options), E.toError),
+		TE.tryCatch(() => vaultsApi.yggdrasil(undefined /* height */), E.toError),
 		TE.map(({ data }) => data)
 	);
 
@@ -184,7 +181,7 @@ const loadYggsJSON = (id: string): TE.TaskEither<Error, Vault[]> =>
 const loadPools = (): TE.TaskEither<Error, PoolDetails> =>
 	FP.pipe(
 		TE.tryCatch(
-			() => midgardApi.getPools(undefined /* status */, undefined /* period */, options),
+			() => midgardApi.getPools(undefined /* status */, undefined /* period */),
 			E.toError
 		),
 		TE.map(({ data }) => data)
@@ -198,7 +195,7 @@ const loadPoolsJSON = (id: string): TE.TaskEither<Error, PoolDetails> =>
 
 const loadStats = (): TE.TaskEither<Error, StatsData> =>
 	FP.pipe(
-		TE.tryCatch(() => midgardApi.getStats(options), E.toError),
+		TE.tryCatch(() => midgardApi.getStats(), E.toError),
 		TE.map(({ data }) => data)
 	);
 
@@ -210,7 +207,7 @@ const loadStatsJSON = (id: string): TE.TaskEither<Error, StatsData> =>
 
 const loadNodes = (): TE.TaskEither<Error, Node[]> =>
 	FP.pipe(
-		TE.tryCatch(() => nodesApi.nodes(undefined /* height */, options), E.toError),
+		TE.tryCatch(() => nodesApi.nodes(undefined /* height */), E.toError),
 		TE.map(({ data }) => data)
 	);
 
