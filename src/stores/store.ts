@@ -6,7 +6,7 @@ import {
 } from '@xchainjs/xchain-thornode';
 import type { Vault } from '@xchainjs/xchain-thornode';
 import * as FP from 'fp-ts/lib/function';
-import { MAX_REALOAD_COUNTER, THORNODE_URL } from './const';
+import { APP_IDENTIFIER, MAX_REALOAD_COUNTER, THORNODE_URL } from './const';
 import { derived, get, writable, type Readable, type Writable } from 'svelte/store';
 import * as E from 'fp-ts/lib/Either';
 import * as RD from '@devexperts/remote-data-ts';
@@ -36,6 +36,29 @@ import {
 } from '../utils/data';
 import type * as Ord from 'fp-ts/lib/Ord';
 import { assetToString, bnOrZero } from '@xchainjs/xchain-util';
+import axios from 'axios';
+
+axios.interceptors.request.use(
+	(config) => {
+		try {
+			// Creating an URL will throw an `TypeError` if `url` is not available and 'unknown-url' is set
+			// [TypeError: Invalid URL] input: 'unknown-url', code: 'ERR_INVALID_URL' }
+			const url = new URL(config?.url ?? 'unknown-url');
+			if (url.host.includes('ninerealms')) {
+				// headers can be undefined/empty in `AxiosRequestConfig`
+				if (!config.headers) config.headers = {};
+				config.headers['x-client-id'] = `${APP_IDENTIFIER}`;
+			}
+		} catch (error) {
+			console.error(`Failed to add custom 'x-client-id' header`, error);
+		}
+
+		return config;
+	},
+	(error) => {
+		return Promise.reject(error);
+	}
+);
 
 const midgardConfig = new MidgardConfig({ basePath: MIDGARD_URL });
 const midgardApi = new DefaultApi(midgardConfig);
@@ -150,7 +173,7 @@ export const timeLeft$: Readable<number> = derived(
 
 const loadAsgards = (): TE.TaskEither<Error, Vault[]> =>
 	FP.pipe(
-		TE.tryCatch(() => vaultsApi.asgard(), E.toError),
+		TE.tryCatch(() => vaultsApi.asgard(undefined /* height */), E.toError),
 		TE.map(({ data }) => data)
 	);
 
@@ -162,7 +185,7 @@ const loadAsgardsJSON = (id: string): TE.TaskEither<Error, Vault[]> =>
 
 const loadYggs = (): TE.TaskEither<Error, Vault[]> =>
 	FP.pipe(
-		TE.tryCatch(() => vaultsApi.yggdrasil(), E.toError),
+		TE.tryCatch(() => vaultsApi.yggdrasil(undefined /* height */), E.toError),
 		TE.map(({ data }) => data)
 	);
 
@@ -174,7 +197,10 @@ const loadYggsJSON = (id: string): TE.TaskEither<Error, Vault[]> =>
 
 const loadPools = (): TE.TaskEither<Error, PoolDetails> =>
 	FP.pipe(
-		TE.tryCatch(() => midgardApi.getPools(), E.toError),
+		TE.tryCatch(
+			() => midgardApi.getPools(undefined /* status */, undefined /* period */),
+			E.toError
+		),
 		TE.map(({ data }) => data)
 	);
 
@@ -198,7 +224,7 @@ const loadStatsJSON = (id: string): TE.TaskEither<Error, StatsData> =>
 
 const loadNodes = (): TE.TaskEither<Error, Node[]> =>
 	FP.pipe(
-		TE.tryCatch(() => nodesApi.nodes(), E.toError),
+		TE.tryCatch(() => nodesApi.nodes(undefined /* height */), E.toError),
 		TE.map(({ data }) => data)
 	);
 

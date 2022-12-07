@@ -2,11 +2,7 @@
 
 **LIVE** :eyes: https://veado.github.io/thorchain-proof-of-vaults
 
-
 https://user-images.githubusercontent.com/61792675/204032338-f6a515c6-df14-4887-b7af-d3ddd2d6dfa6.mp4
-
-
-
 
 ### Where does the data come from?
 
@@ -15,12 +11,15 @@ https://user-images.githubusercontent.com/61792675/204032338-f6a515c6-df14-4887-
 
 ## ENV
 
-Copy [env.sample](env.sample) and rename to `.env`. Change environment variables to you needs.
+Copy [env.sample](env.sample) and rename to `.env`. Change environment variables to your needs.
 
 ```
-# Midgard
-VITE_MIDGARD_URL=
-VITE_THORNODE_URL=
+# THORNode endpoint
+VITE_THORNODE_URL=https://thornode.ninerealms.com
+# Midgard endpoint
+VITE_MIDGARD_URL=https://midgard.ninerealms.com
+# App identifier - needed for requests to ninerealms.com only - keep it empty if you are using other endpoints
+VITE_APP_IDENTIFIER=
 ```
 
 ### Local development

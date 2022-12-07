@@ -6,6 +6,7 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
+	readonly VITE_APP_IDENTIFIER: string;
 	readonly VITE_MIDGARD_URL: string;
 	readonly VITE_THORNODE_URL: string;
 	readonly VITE_VERSION: string;
