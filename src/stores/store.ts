@@ -40,10 +40,19 @@ import axios from 'axios';
 
 axios.interceptors.request.use(
 	(config) => {
-		const url = new URL(config.url);
-		if (url.host.includes('ninerealms')) {
-			config.headers['x-client-id'] = `${APP_IDENTIFIER}`;
+		try {
+			// Creating an URL will throw an `TypeError` if `url` is not available and 'unknown-url' is set
+			// [TypeError: Invalid URL] input: 'unknown-url', code: 'ERR_INVALID_URL' }
+			const url = new URL(config?.url ?? 'unknown-url');
+			if (url.host.includes('ninerealms')) {
+				// headers can be undefined/empty in `AxiosRequestConfig`
+				if (!config.headers) config.headers = {};
+				config.headers['x-client-id'] = `${APP_IDENTIFIER}`;
+			}
+		} catch (error) {
+			console.error(`Failed to add custom 'x-client-id' header`, error);
 		}
+
 		return config;
 	},
 	(error) => {
