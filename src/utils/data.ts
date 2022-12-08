@@ -94,7 +94,7 @@ export const toNodesDataMap = (nodes: TN.Node[]): NodesDataMap =>
 		A.reduce<TN.Node, NodesDataMap>(new Map(), (acc, cur: TN.Node) => {
 			const pubKeySecp256k1 = cur.pub_key_set.secp256k1;
 			if (pubKeySecp256k1) {
-				const bondAmount = baseAmount(cur.bond, THORNODE_DECIMAL);
+				const bondAmount = baseAmount(cur.total_bond, THORNODE_DECIMAL);
 				return acc.set(pubKeySecp256k1, {
 					bondAmount,
 					nodeStatus: cur.status,
