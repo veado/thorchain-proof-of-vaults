@@ -125,7 +125,7 @@ export const toPoolsDataMap = (pools: PoolDetails): PoolsDataMap =>
 					() => acc,
 					(asset) => {
 						const decimalInt = Number.parseInt(cur.nativeDecimal);
-						const decimal = !isNaN(decimalInt) || decimalInt > -1 ? decimalInt : THORNODE_DECIMAL;
+						const decimal = !isNaN(decimalInt) && decimalInt > -1 ? decimalInt : THORNODE_DECIMAL;
 						return acc.set(cur.asset, {
 							asset,
 							status: (cur.status || 'unknown') as PoolStatus,
