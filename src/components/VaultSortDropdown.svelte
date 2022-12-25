@@ -29,9 +29,11 @@
           px-3
           py-1.5
           text-start
-          text-gray-400 hover:border-gray-500
-          hover:text-gray-500 hover:shadow-lg
-          focus:ring-0
+          text-gray-400
+          hover:border-gray-500
+          hover:text-gray-500 hover:shadow-lg focus:ring-0 dark:border-gray-300 dark:bg-gray-900
+          dark:text-gray-200 dark:hover:border-gray-100
+          dark:hover:text-gray-100
         "
 		type="button"
 		id="dropdownMenuButton"
@@ -58,6 +60,7 @@
           py-2
           text-left
           shadow-lg
+          dark:bg-gray-900
         "
 		aria-labelledby="dropdownMenuButton"
 	>
@@ -67,7 +70,7 @@
 				<button
 					disabled={selected}
 					class="
-            {selected ? 'bg-gray-200' : ''}
+            {selected ? 'bg-gray-100 dark:bg-gray-800' : ''}
               dropdown-item
               block
               w-full
@@ -78,6 +81,9 @@
               text-gray-500
               hover:bg-gray-100
               hover:text-gray-700
+              dark:text-gray-200
+              dark:hover:bg-gray-800
+              dark:hover:text-gray-100
             "
 					on:click={() => dispatch('item-selected', key)}
 				>

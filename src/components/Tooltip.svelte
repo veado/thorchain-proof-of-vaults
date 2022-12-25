@@ -30,7 +30,7 @@
 {#if showTooltip}
 	<div
 		transition:fade={{ duration: 200 }}
-		class="relative bg-gray-400 text-xs uppercase text-gray-50 {classNameTooltip}"
+		class="relative bg-gray-400 text-xs uppercase text-gray-50 dark:bg-gray-800 {classNameTooltip}"
 		use:popperContent={extraOpts}
 	>
 		<!--

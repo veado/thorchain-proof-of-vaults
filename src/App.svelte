@@ -29,6 +29,8 @@
 	import Error from './components/Error.svelte';
 	import Footer from './components/Footer.svelte';
 	import MigrationStatus from './components/MigrationStatus.svelte';
+	import { initTheme } from './stores/theme';
+	import ThemeSwitch from './components/ThemeSwitch.svelte';
 
 	$: loading = RD.isPending($dataRD$);
 	$: error = FP.pipe(
@@ -67,13 +69,19 @@
 	$: vaultDetailsCollapsed = eqOptionString.equals(vaultDetailsStatus, O.some('collapsed'));
 	$: vaultDetailsExpanded = eqOptionString.equals(vaultDetailsStatus, O.some('expanded'));
 
-	// load all data at start
-	onMount(loadAllData);
+	onMount(async () => {
+		// init theme
+		initTheme();
+		// load all data at start
+		loadAllData();
+	});
 </script>
 
-<div class="flex flex-col items-center px-5  md:px-10 xl:px-20">
+<!-- theme switch -->
+<div class="flex w-full justify-end p-5"><ThemeSwitch /></div>
+<div class="flex flex-col items-center px-5 md:px-10 xl:px-20">
 	<!-- logo + title -->
-	<header class="container flex flex-col items-center bg-gray-50 py-10">
+	<header class="container flex flex-col items-center bg-gray-50 py-10 dark:bg-gray-700">
 		<a href="https://thorchain.org/" class="">
 			<img
 				src={logo}
@@ -81,10 +89,10 @@
 				alt=""
 			/>
 		</a>
-		<h1 class="mt-2 text-2xl uppercase text-gray-900">Proof Of Vaults</h1>
+		<h1 class="mt-2 text-2xl uppercase text-gray-900 dark:text-gray-50">Proof Of Vaults</h1>
 	</header>
-	<div class="container flex flex-col bg-white shadow-md">
-		<nav class="w-full bg-gray-200 py-5 px-5 md:px-10 ">
+	<div class="container flex flex-col bg-white shadow-md dark:bg-gray-900">
+		<nav class="w-full bg-gray-200 py-5 px-5 dark:bg-gray-800 md:px-10 ">
 			<!-- sort / search -->
 			<div class="flex flex-col items-center lg:flex-row">
 				<div class="flex w-full flex-col items-center justify-center md:w-auto md:flex-row">
@@ -105,14 +113,14 @@
 				<!-- collapse / expand -->
 				<div class="mt-2 flex flex-1 items-center justify-end lg:mt-0">
 					<button
-						class="ml-2 text-gray-400 underline hover:text-tc"
+						class="ml-2 text-gray-400 underline hover:text-tc dark:text-gray-200 dark:hover:text-tc"
 						on:click={expandDetails}
 						disabled={vaultDetailsExpanded}
 					>
 						Expand All
 					</button>
 					<button
-						class="ml-2 text-gray-400 underline hover:text-tc"
+						class="ml-2 text-gray-400 underline hover:text-tc dark:text-gray-200 dark:hover:text-tc"
 						on:click={collapseDetails}
 						disabled={vaultDetailsCollapsed}
 					>
@@ -134,9 +142,9 @@
 		<div class="mt-10 flex w-full flex-col items-center">
 			<button
 				class="flex w-auto items-center rounded-full
-           bg-gray-400 px-6 py-1 text-lg uppercase text-white
-            hover:bg-tc
-         hover:shadow-lg {loading ? 'cursor-not-allowed' : 'cursor-pointer hover:scale-105'}
+           bg-gray-400 px-6 py-1 text-lg uppercase text-white hover:bg-tc hover:shadow-lg
+            dark:bg-gray-600
+         dark:hover:bg-tc {loading ? 'cursor-not-allowed' : 'cursor-pointer hover:scale-105'}
          ease
          "
 				on:click={loadAllData}
@@ -156,8 +164,8 @@
           h-4 w-4 
           cursor-pointer 
           appearance-none 
-          rounded-sm border border-gray-400 bg-white bg-contain bg-center bg-no-repeat 
-          align-top checked:border-none checked:bg-gray-400 focus:outline-none"
+          rounded-sm border border-gray-400 bg-white bg-contain bg-center bg-no-repeat align-top checked:border-none 
+          checked:bg-gray-400 focus:outline-none dark:border-gray-600 dark:bg-gray-900 dark:checked:bg-gray-600"
 					checked={$autoReload$$}
 					disabled={loading}
 					on:change={() => autoReload$$.update((v) => !v)}
@@ -166,8 +174,8 @@
 					class="ml-2 text-sm 
         {loading
 						? 'cursor-not-allowed text-gray-300'
-						: 'cursor-pointer text-gray-400 hover:text-gray-500'}
-            peer-checked:text-gray-500
+						: 'cursor-pointer text-gray-400 hover:text-gray-500 dark:text-gray-600  dark:hover:text-gray-300'}
+            peer-checked:text-gray-500 dark:peer-checked:text-gray-300
             "
 					for="autoreload"
 					>Auto reload {$autoReload$$
@@ -183,7 +191,7 @@
 			{/if}
 			{#if !$vaults$.length && loading}
 				<div class="flex w-full justify-center py-40">
-					<LoaderIcon class="!h-10 !w-10 text-gray-300" />
+					<LoaderIcon class="!h-10 !w-10 text-gray-300 dark:text-gray-100" />
 				</div>
 			{/if}
 			{#if $vaults$.length}

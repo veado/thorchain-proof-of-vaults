@@ -60,22 +60,28 @@
 
 <!-- vaults wrapper -->
 <div
-	class="mb-5 flex flex-col rounded-lg border border-gray-300 p-5 lg:p-10 xl:mb-10 xl:rounded-xl "
+	class="mb-5 flex flex-col rounded-lg border border-gray-300 p-5 dark:border-gray-400 lg:p-10 xl:mb-10 xl:rounded-xl "
 >
 	<!-- vault overview -->
 	<div class="flex flex-col items-center justify-center">
 		<div class="flex flex-col items-center lg:flex-row">
 			<!-- asset -->
-			<div class="flex items-center pb-3 lg:border-r lg:border-gray-400 lg:pr-10 lg:pb-0 ">
+			<div
+				class="flex items-center pb-3 lg:border-r lg:border-gray-300 lg:pr-10 lg:pb-0 dark:lg:border-gray-400 "
+			>
 				<AssetIcon
 					class="h-[45px] w-[45px] lg:h-[60px] lg:w-[60px] xl:h-[70px] xl:w-[70px]"
 					{asset}
 				/>
 				<div class="ml-2 lg:ml-3 xl:ml-5">
-					<h1 class="pb-1 text-xl leading-none text-gray-800 lg:text-3xl xl:text-4xl">
+					<h1
+						class="pb-1 text-xl leading-none text-gray-800 dark:text-gray-100 lg:text-3xl xl:text-4xl"
+					>
 						{asset.ticker}
 					</h1>
-					<h2 class="lg:text-1xl py-0 text-lg leading-none text-gray-400 xl:text-2xl">
+					<h2
+						class="lg:text-1xl py-0 text-lg leading-none text-gray-400 dark:text-gray-300 xl:text-2xl"
+					>
 						{asset.chain}
 					</h2>
 				</div>
@@ -84,7 +90,7 @@
 			<!-- amount -->
 			<div class="ml-0 mt-3 flex flex-col lg:mt-0 lg:ml-10">
 				<h3
-					class="py-0 text-center text-xl leading-none text-gray-600 lg:text-start lg:text-3xl xl:text-4xl"
+					class="py-0 text-center text-xl leading-none text-gray-800 dark:text-gray-100 lg:text-start lg:text-3xl xl:text-4xl"
 				>
 					{formatAssetAmountCurrency({
 						amount: baseToAsset(total),
@@ -94,7 +100,7 @@
 					})}
 				</h3>
 				<h3
-					class="lg:text-1xl py-0 pt-1 text-center text-lg leading-none text-gray-400 lg:text-start xl:text-2xl"
+					class="lg:text-1xl py-0 pt-1 text-center text-lg leading-none text-gray-400 dark:text-gray-300 lg:text-start xl:text-2xl"
 				>
 					{FP.pipe(
 						totalUSD,
@@ -109,7 +115,7 @@
 								})
 						)
 					)}
-					<span class="block text-sm text-gray-300 lg:inline-block">
+					<span class="block text-sm text-gray-300 dark:text-gray-300 lg:inline-block">
 						{FP.pipe(
 							assetPriceUSD,
 							O.fold(
@@ -134,29 +140,33 @@
 		<!-- vaults content -->
 		<div class="flex flex-col items-center">
 			{#if eqAsset(asset, AssetRuneNative)}
-				<div class="text-sm uppercase text-gray-400">Bonded by</div>
-				<div class="text-base uppercase text-gray-500 lg:text-base xl:text-xl">
+				<div class="text-sm uppercase text-gray-400 dark:text-gray-200">Bonded by</div>
+				<div class="text-base uppercase text-gray-500 dark:text-gray-300 lg:text-base xl:text-xl">
 					{noNodes} Nodes
 				</div>
-				<div class="text-center text-sm uppercase text-gray-400 lg:px-3">
+				<div class="text-center text-sm uppercase text-gray-400 dark:text-gray-200 lg:px-3">
 					to manage {$noTotalAsgards$} Asgards and {$noTotalYggs$} Yggdrasils
 				</div>
 			{:else}
 				{@const poolStatus = getPoolStatus(asset, $pools$)}
-				<div class="mb-0.5 text-sm  uppercase text-gray-400 lg:mb-1">Distributed by</div>
+				<div class="mb-0.5 text-sm uppercase text-gray-400 dark:text-gray-200 lg:mb-1">
+					Distributed by
+				</div>
 				<div class="flex flex-col items-center md:flex-row">
-					<div class="px-3 text-sm uppercase text-gray-500 lg:text-base xl:text-lg">
+					<div
+						class="px-3 text-sm uppercase text-gray-500 dark:text-gray-300 lg:text-base xl:text-lg"
+					>
 						{noAsgards} Asgards
 					</div>
 					{#if noYggs > 0}
 						<div
-							class="border-gray-400 px-3 text-sm uppercase text-gray-500 md:border-l lg:text-base xl:text-lg"
+							class="border-gray-300 px-3 text-sm uppercase text-gray-500 dark:border-gray-400 dark:text-gray-300 md:border-l lg:text-base xl:text-lg"
 						>
 							{noYggs} Yggdrasils
 						</div>
 					{/if}
 					<div
-						class="border-gray-400 px-3 text-sm uppercase text-gray-500  md:border-l lg:text-base xl:text-lg"
+						class="border-gray-300 px-3 text-sm uppercase text-gray-500 dark:border-gray-400 dark:text-gray-300 md:border-l lg:text-base xl:text-lg"
 					>
 						{#if poolStatus !== 'unknown'}
 							1
@@ -170,7 +180,7 @@
 	<!-- toggle button -->
 	<div class="mt-5 flex justify-center xl:mt-10">
 		<button
-			class="ease rounded-full border-2 border-gray-400 bg-white p-3 text-gray-400 hover:scale-105 hover:border-tc hover:text-tc hover:shadow-lg lg:p-4 "
+			class="ease rounded-full border-2 border-gray-400 bg-white p-3 text-gray-400 hover:scale-105 hover:border-tc hover:text-tc hover:shadow-lg dark:bg-gray-900 dark:text-gray-200 dark:hover:text-tc lg:p-4 "
 			on:click={toggleDetails}
 		>
 			<ChevronDoubleDownIcon class="h-4 w-4 lg:h-6 lg:w-6 {showDetails ? 'rotate-180' : ''}" />
