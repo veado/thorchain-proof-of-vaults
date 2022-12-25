@@ -14,7 +14,13 @@
 		AssetRuneNative
 	} from '@xchainjs/xchain-util';
 
-	import { pools$, noTotalAsgards$, noTotalYggs$ } from '../stores/store';
+	import {
+		pools$,
+		noTotalAsgards$,
+		noTotalYggs$,
+		noActiveNodes$,
+		noStandbyNodes$
+	} from '../stores/store';
 	import { getNoVaultsFromVaultData, getPoolStatus } from '../utils/data';
 
 	import AssetIcon from './AssetIcon.svelte';
@@ -115,7 +121,7 @@
 								})
 						)
 					)}
-					<span class="block text-sm text-gray-300 dark:text-gray-300 lg:inline-block">
+					<span class="block text-sm text-gray-300 dark:text-gray-500 lg:inline-block">
 						{FP.pipe(
 							assetPriceUSD,
 							O.fold(
@@ -144,7 +150,10 @@
 				<div class="text-base uppercase text-gray-500 dark:text-gray-300 lg:text-base xl:text-xl">
 					{noNodes} Nodes
 				</div>
-				<div class="text-center text-sm uppercase text-gray-400 dark:text-gray-200 lg:px-3">
+				<div class="text-sm uppercase text-gray-400 dark:text-gray-400">
+					({$noActiveNodes$} active, {$noStandbyNodes$} standby)
+				</div>
+				<div class="py-2 text-center text-sm uppercase text-gray-400 dark:text-gray-200 lg:px-3">
 					to manage {$noTotalAsgards$} Asgards and {$noTotalYggs$} Yggdrasils
 				</div>
 			{:else}
