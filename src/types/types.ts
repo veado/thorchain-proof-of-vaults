@@ -4,6 +4,8 @@ import type * as RD from '@devexperts/remote-data-ts';
 import type BigNumber from 'bignumber.js';
 import type { BaseAmount, Address, Asset, AssetAmount } from '@xchainjs/xchain-util';
 
+export type Theme = 'dark' | 'light';
+
 export type VaultType = 'asgard' | 'ygg' | 'node' | 'unknown';
 export type VaultStatus =
 	| 'RetiringVault'

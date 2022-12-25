@@ -83,9 +83,9 @@
 	};
 </script>
 
-<div class="flex flex-col items-center rounded-lg bg-gray-50 pb-4 {className}">
+<div class="flex flex-col items-center rounded-lg bg-gray-50 pb-4 dark:bg-gray-700 {className}">
 	<Tooltip
-		class="flex w-full cursor-default items-center justify-center rounded-t-lg bg-gray-100 py-2 px-2 text-center text-sm font-semibold uppercase text-gray-500"
+		class="flex w-full cursor-default items-center justify-center rounded-t-lg bg-gray-100 py-2 px-2 text-center text-sm font-semibold uppercase text-gray-500 dark:bg-gray-600 dark:text-gray-200"
 	>
 		<!-- status icon -->
 		<span class="{bgColorByVaultStatus(status)} mr-1 block h-2 w-2 rounded-full" />
@@ -105,7 +105,7 @@
 		</svelte:fragment>
 	</Tooltip>
 
-	<div class="pt-2 text-xs uppercase text-gray-400">
+	<div class="pt-4 text-xs uppercase text-gray-400 dark:text-gray-400">
 		{membershipLabel()}
 		<Tooltip class="cursor-default"
 			>{membersLabel}
@@ -127,7 +127,7 @@
 			</div>
 		</Tooltip>
 	</div>
-	<div class="pt-4 text-xl leading-none text-gray-600">
+	<div class="pt-4 text-xl leading-none text-gray-600 dark:text-gray-200">
 		{formatAssetAmountCurrency({
 			amount: baseToAsset(amount),
 			asset,
@@ -135,7 +135,7 @@
 			trimZeros: true
 		})}
 	</div>
-	<div class="pt-2 text-base leading-none  text-gray-400">
+	<div class="pt-2 text-base leading-none text-gray-400 dark:text-gray-400">
 		{FP.pipe(
 			sequenceSOption({
 				asset: O.fromNullable(assetFromString('BNB.BUSD')),
@@ -150,8 +150,7 @@
 
 	{#if !!addr}
 		<button
-			class="flex cursor-pointer items-center justify-center pt-3 pb-1 text-base text-gray-500 hover:text-tc"
-			alt={addr}
+			class="flex cursor-pointer items-center justify-center pt-3 pb-1 text-base text-gray-500 hover:text-tc dark:text-gray-300 dark:hover:text-tc"
 			on:click={() => onClickAddress(addr, asset.chain)}
 		>
 			{trimAddress(addr)}
