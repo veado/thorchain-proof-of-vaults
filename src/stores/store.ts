@@ -98,6 +98,14 @@ export const noTotalYggs$: Readable<number> = derived(vaults$, (vaults) =>
 	getNoVaultsFromVaultList({ type: 'ygg', list: vaults })
 );
 
+export const noActiveNodes$: Readable<number> = derived(vaults$, (vaults) =>
+	getNoVaultsFromVaultList({ type: 'node', list: vaults, status: 'Active' })
+);
+
+export const noStandbyNodes$: Readable<number> = derived(vaults$, (vaults) =>
+	getNoVaultsFromVaultList({ type: 'node', list: vaults, status: 'Standby' })
+);
+
 const VAULT_SORT_MAP: Record<VaultSort, Ord.Ord<VaultListData>> = {
 	usd: ordVaultByUSDAmount,
 	usdRev: ordVaultByUSDAmountReverse,
@@ -116,7 +124,7 @@ export const vaultsSorted$: Readable<VaultList> = derived(
 			A.sort(VAULT_SORT_MAP[vaultSort]),
 			A.filter(({ asset }) => {
 				if (!search) return true;
-				return assetToString(asset).toLowerCase().includes(search);
+				return assetToString(asset).toLowerCase().includes(search.toLowerCase());
 			})
 		)
 );

@@ -77,11 +77,18 @@
 	});
 </script>
 
+{#if $noRetiringAsgards$}
+	<MigrationStatus
+		noRetiringAsgards={$noRetiringAsgards$}
+		noActiveAsgards={$noActiveAsgards$}
+		class="w-full"
+	/>
+{/if}
 <!-- theme switch -->
-<div class="flex w-full justify-end p-5"><ThemeSwitch /></div>
+<div class="flex w-full justify-end p-3"><ThemeSwitch /></div>
 <div class="flex flex-col items-center px-5 md:px-10 xl:px-20">
 	<!-- logo + title -->
-	<header class="container flex flex-col items-center bg-gray-50 py-10 dark:bg-gray-700">
+	<header class="container flex flex-col items-center bg-gray-50 pb-16 dark:bg-gray-700">
 		<a href="https://thorchain.org/" class="">
 			<img
 				src={logo}
@@ -91,6 +98,7 @@
 		</a>
 		<h1 class="mt-2 text-2xl uppercase text-gray-900 dark:text-gray-50">Proof Of Vaults</h1>
 	</header>
+
 	<div class="container flex flex-col bg-white shadow-md dark:bg-gray-900">
 		<nav class="w-full bg-gray-200 py-5 px-5 dark:bg-gray-800 md:px-10 ">
 			<!-- sort / search -->
@@ -129,13 +137,6 @@
 				</div>
 			</div>
 		</nav>
-		{#if $noRetiringAsgards$}
-			<MigrationStatus
-				noRetiringAsgards={$noRetiringAsgards$}
-				noActiveAsgards={$noActiveAsgards$}
-				class="w-full "
-			/>
-		{/if}
 
 		<!-- reload -->
 
