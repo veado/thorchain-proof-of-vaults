@@ -98,14 +98,6 @@ export const noTotalYggs$: Readable<number> = derived(vaults$, (vaults) =>
 	getNoVaultsFromVaultList({ type: 'ygg', list: vaults })
 );
 
-export const noActiveNodes$: Readable<number> = derived(vaults$, (vaults) =>
-	getNoVaultsFromVaultList({ type: 'node', list: vaults, status: 'Active' })
-);
-
-export const noStandbyNodes$: Readable<number> = derived(vaults$, (vaults) =>
-	getNoVaultsFromVaultList({ type: 'node', list: vaults, status: 'Standby' })
-);
-
 const VAULT_SORT_MAP: Record<VaultSort, Ord.Ord<VaultListData>> = {
 	usd: ordVaultByUSDAmount,
 	usdRev: ordVaultByUSDAmountReverse,
@@ -286,7 +278,7 @@ export const loadAllData = async () =>
 
 						const nodesDataMap = toNodesDataMap(nodes);
 
-						const asgardYggsList = toVaultList({
+						const asgardYggsList: VaultList = toVaultList({
 							vaults: asgardYggsVaults,
 							poolsData: poolsDataMap,
 							nodesData: nodesDataMap
@@ -294,7 +286,7 @@ export const loadAllData = async () =>
 
 						const runeUSDPrice = bnOrZero(stats.runePriceUSD);
 
-						const nodeVaultList = toNodesVaultList({
+						const nodeVaultList: VaultList = toNodesVaultList({
 							vaults: asgardYggsVaults,
 							nodesData: nodesDataMap,
 							runeUSDPrice

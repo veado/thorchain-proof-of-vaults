@@ -49,6 +49,7 @@ import {
 	unionString
 } from './fp';
 import { derived, type Readable, type Writable } from 'svelte/store';
+import { NodeStatusEnum } from '@xchainjs/xchain-thornode';
 
 /**
  * Helper to convert decimals
@@ -92,13 +93,15 @@ export const toNodesDataMap = (nodes: TN.Node[]): NodesDataMap =>
 	FP.pipe(
 		nodes,
 		A.reduce<TN.Node, NodesDataMap>(new Map(), (acc, cur: TN.Node) => {
-			const pubKeySecp256k1 = cur.pub_key_set.secp256k1;
-			if (pubKeySecp256k1) {
-				const bondAmount = baseAmount(cur.total_bond, THORNODE_DECIMAL);
+			const { status, total_bond, node_address, pub_key_set } = cur;
+			const pubKeySecp256k1 = pub_key_set.secp256k1;
+			// Accept active nodes and data w/ pubKey only
+			if (status === NodeStatusEnum.Active && pubKeySecp256k1) {
+				const bondAmount = baseAmount(total_bond, THORNODE_DECIMAL);
 				return acc.set(pubKeySecp256k1, {
 					bondAmount,
-					nodeStatus: cur.status,
-					nodeAddress: cur.node_address,
+					nodeStatus: status,
+					nodeAddress: node_address,
 					pubKeySecp256k1
 				});
 			} else {
@@ -437,8 +440,8 @@ export const getNoVaultsFromVaultList = ({
 		),
 		A.flatten,
 		A.map(({ id }) => id),
-		(vaults) => unionString(vaults)(vaults),
-		(vaults) => vaults.length
+		(vaultIds) => unionString(vaultIds)(vaultIds),
+		(vaultIds) => vaultIds.length
 	);
 
 export const getNoVaultsFromVaultData = (type: VaultType, list: VaultData[]): number =>
