@@ -1,6 +1,6 @@
 {
 	"name": "thorchain-proof-of-vaults",
-	"version": "0.9.4",
+	"version": "1.0.0",
 	"type": "module",
 	"scripts": {
 		"dev": "vite",
