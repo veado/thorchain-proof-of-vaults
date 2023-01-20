@@ -98,6 +98,10 @@ export const noTotalYggs$: Readable<number> = derived(vaults$, (vaults) =>
 	getNoVaultsFromVaultList({ type: 'ygg', list: vaults })
 );
 
+export const noTotalNodes$: Readable<number> = derived(vaults$, (vaults) =>
+	getNoVaultsFromVaultList({ type: 'node', list: vaults })
+);
+
 const VAULT_SORT_MAP: Record<VaultSort, Ord.Ord<VaultListData>> = {
 	usd: ordVaultByUSDAmount,
 	usdRev: ordVaultByUSDAmountReverse,
