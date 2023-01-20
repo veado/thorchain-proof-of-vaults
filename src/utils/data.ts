@@ -6,7 +6,7 @@ import type * as TN from '@xchainjs/xchain-thornode';
 import { v4 as uuidv4 } from 'uuid';
 
 import {
-	Chain,
+	type Chain,
 	baseAmount,
 	type Asset,
 	type BaseAmount,
@@ -18,8 +18,7 @@ import {
 	type AssetAmount,
 	eqAsset,
 	bn,
-	assetAmount,
-	AssetRuneNative
+	assetAmount
 } from '@xchainjs/xchain-util';
 import * as FP from 'fp-ts/lib/function';
 import * as A from 'fp-ts/lib/Array';
@@ -39,7 +38,19 @@ import type {
 	VaultStatus,
 	VaultType
 } from 'src/types/types';
-import { THORNODE_DECIMAL } from '../stores/const';
+import {
+	AssetRuneNative,
+	AVAXChain,
+	BCHChain,
+	BNBChain,
+	BTCChain,
+	DOGEChain,
+	ETHChain,
+	GAIAChain,
+	LTCChain,
+	THORChain,
+	THORNODE_DECIMAL
+} from '../stores/const';
 import type { PoolDetail, PoolDetails } from '@xchainjs/xchain-midgard';
 import {
 	monoidAssetAmount,
@@ -461,24 +472,23 @@ export const getNoVaultsFromVaultMemberships = (
 
 export const getExplorerAddressUrl = (chain: Chain, address: Address) => {
 	switch (chain) {
-		case Chain.Avalanche:
-		case Chain.Avax:
+		case AVAXChain:
 			return `https://snowtrace.io/address/${address}`;
-		case Chain.Binance:
+		case BNBChain:
 			return `https://explorer.binance.org/address/${address}`;
-		case Chain.Bitcoin:
+		case BTCChain:
 			return `https://blockstream.info/address/${address}`;
-		case Chain.BitcoinCash:
+		case BCHChain:
 			return `https://www.blockchain.com/bch/address/${address}`;
-		case Chain.Litecoin:
+		case LTCChain:
 			return `https://blockchair.com/litecoin/address/${address}`;
-		case Chain.Doge:
+		case DOGEChain:
 			return `https://blockchair.com/dogecoin/address/${address}`;
-		case Chain.Cosmos:
+		case GAIAChain:
 			return `https://cosmos.bigdipper.live/account/${address}`;
-		case Chain.THORChain:
+		case THORChain:
 			return `https://thorchain.net/node/${address}`;
-		case Chain.Ethereum:
+		case ETHChain:
 			return `https://etherscan.io/address/${address}`;
 	}
 };

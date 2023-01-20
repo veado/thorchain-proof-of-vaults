@@ -10,8 +10,7 @@
 		formatAssetAmountCurrency,
 		baseToAsset,
 		assetAmount,
-		eqAsset,
-		AssetRuneNative
+		eqAsset
 	} from '@xchainjs/xchain-util';
 
 	import { pools$ } from '../stores/store';
@@ -23,7 +22,7 @@
 	import Vault from './Vault.svelte';
 	import { createEventDispatcher } from 'svelte';
 	import { ChevronDoubleDownIcon } from '@krowten/svelte-heroicons';
-	import { THORNODE_DECIMAL } from '../stores/const';
+	import { AssetRuneNative, THORNODE_DECIMAL } from '../stores/const';
 
 	export let item: VaultListData = undefined;
 	export let loading = false;

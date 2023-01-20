@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { SearchIcon, XIcon } from '@krowten/svelte-heroicons';
+	import { MagnifyingGlassIcon, XMarkIcon } from '@krowten/svelte-heroicons';
 	import { createEventDispatcher } from 'svelte';
 
 	const dispatch = createEventDispatcher();
@@ -50,7 +50,7 @@
 		on:keydown={onKeyDownHandler}
 		on:input={onChangeHandler}
 	/>
-	<SearchIcon
+	<MagnifyingGlassIcon
 		class="absolute left-2 top-[50%] h-5 w-5 translate-y-[-50%] text-gray-400 peer-focus:text-gray-500 dark:text-gray-200 dark:peer-focus:text-gray-100 {disabled
 			? 'cursor-not-allowed opacity-50'
 			: 'cursor-pointer'}"
@@ -64,6 +64,6 @@
 			: 'block'}"
 		on:click={onCancel}
 	>
-		<XIcon class="h-4 w-4" />
+		<XMarkIcon class="h-4 w-4" />
 	</button>
 </div>

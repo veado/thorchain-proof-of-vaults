@@ -5,14 +5,13 @@
 	import { sequenceSOption } from '../utils/fp';
 	import {
 		assetFromString,
-		AssetRuneNative,
 		baseToAsset,
-		Chain,
+		type Chain,
 		eqAsset,
 		formatAssetAmountCurrency,
 		type Address
 	} from '@xchainjs/xchain-util';
-	import { ExternalLinkIcon } from '@krowten/svelte-heroicons';
+	import { ArrowTopRightOnSquareIcon } from '@krowten/svelte-heroicons';
 	import {
 		bgColorByVaultStatus,
 		labelByVaultStatus,
@@ -26,6 +25,7 @@
 	} from '../utils/data';
 
 	import Tooltip from './Tooltip.svelte';
+	import { AssetRuneNative } from '../stores/const';
 
 	export let data: VaultData;
 	let className = '';
@@ -154,7 +154,7 @@
 			on:click={() => onClickAddress(addr, asset.chain)}
 		>
 			{trimAddress(addr)}
-			<ExternalLinkIcon class="ml-1 h-4 w-4" />
+			<ArrowTopRightOnSquareIcon class="ml-1 h-4 w-4" />
 		</button>
 	{/if}
 </div>
