@@ -5,14 +5,13 @@
 	import { sequenceSOption } from '../utils/fp';
 	import {
 		assetFromString,
-		AssetRuneNative,
 		baseToAsset,
-		Chain,
+		type Chain,
 		eqAsset,
 		formatAssetAmountCurrency,
 		type Address
 	} from '@xchainjs/xchain-util';
-	import { ExternalLinkIcon } from '@krowten/svelte-heroicons';
+	import { ArrowTopRightOnSquareIcon } from '@krowten/svelte-heroicons';
 	import {
 		bgColorByVaultStatus,
 		labelByVaultStatus,
@@ -26,12 +25,13 @@
 	} from '../utils/data';
 
 	import Tooltip from './Tooltip.svelte';
+	import { AssetRuneNative } from '../stores/const';
 
 	export let data: VaultData;
 	let className = '';
 	export { className as class };
 
-	const {
+	$: ({
 		id,
 		type,
 		asset,
@@ -41,19 +41,19 @@
 		address: oAddress,
 		members,
 		memberships
-	} = data;
+	} = data);
 
-	const addr = FP.pipe(
+	$: addr = FP.pipe(
 		oAddress,
 		O.getOrElse(() => '')
 	);
 
-	const hasMemberships = type === 'node' && memberships.length;
+	$: hasMemberships = type === 'node' && memberships.length;
 
-	const noAsgardMemberships = getNoVaultsFromVaultMemberships('asgard', memberships);
-	const noYggMemberships = getNoVaultsFromVaultMemberships('ygg', memberships);
+	$: noAsgardMemberships = getNoVaultsFromVaultMemberships('asgard', memberships);
+	$: noYggMemberships = getNoVaultsFromVaultMemberships('ygg', memberships);
 
-	const membershipLabel = () => {
+	$: membershipLabel = () => {
 		let tooltip = '';
 		if (hasMemberships) {
 			tooltip = 'Member of ';
@@ -71,9 +71,9 @@
 		return tooltip;
 	};
 
-	const hasMembers = type !== 'node' && members.length;
+	$: hasMembers = type !== 'node' && members.length;
 
-	const membersLabel = hasMembers
+	$: membersLabel = hasMembers
 		? `Managed by ${members.length} ${plural('node', members.length)}`
 		: '';
 
@@ -154,7 +154,7 @@
 			on:click={() => onClickAddress(addr, asset.chain)}
 		>
 			{trimAddress(addr)}
-			<ExternalLinkIcon class="ml-1 h-4 w-4" />
+			<ArrowTopRightOnSquareIcon class="ml-1 h-4 w-4" />
 		</button>
 	{/if}
 </div>

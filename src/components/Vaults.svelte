@@ -10,17 +10,10 @@
 		formatAssetAmountCurrency,
 		baseToAsset,
 		assetAmount,
-		eqAsset,
-		AssetRuneNative
+		eqAsset
 	} from '@xchainjs/xchain-util';
 
-	import {
-		pools$,
-		noTotalAsgards$,
-		noTotalYggs$,
-		noActiveNodes$,
-		noStandbyNodes$
-	} from '../stores/store';
+	import { pools$ } from '../stores/store';
 	import { getNoVaultsFromVaultData, getPoolStatus } from '../utils/data';
 
 	import AssetIcon from './AssetIcon.svelte';
@@ -29,7 +22,7 @@
 	import Vault from './Vault.svelte';
 	import { createEventDispatcher } from 'svelte';
 	import { ChevronDoubleDownIcon } from '@krowten/svelte-heroicons';
-	import { THORNODE_DECIMAL } from '../stores/const';
+	import { AssetRuneNative, THORNODE_DECIMAL } from '../stores/const';
 
 	export let item: VaultListData = undefined;
 	export let loading = false;
@@ -57,11 +50,11 @@
 		dispatch('details-visible', showDetails);
 	};
 
-	const { asset, data, total, totalUSD, assetPriceUSD } = item;
+	$: ({ asset, data, total, totalUSD, assetPriceUSD } = item);
 
-	const noAsgards = getNoVaultsFromVaultData('asgard', data);
-	const noYggs = getNoVaultsFromVaultData('ygg', data);
-	const noNodes = getNoVaultsFromVaultData('node', data);
+	$: noAsgards = getNoVaultsFromVaultData('asgard', data);
+	$: noYggs = getNoVaultsFromVaultData('ygg', data);
+	$: noNodes = getNoVaultsFromVaultData('node', data);
 </script>
 
 <!-- vaults wrapper -->
@@ -148,13 +141,7 @@
 			{#if eqAsset(asset, AssetRuneNative)}
 				<div class="text-sm uppercase text-gray-400 dark:text-gray-200">Bonded by</div>
 				<div class="text-base uppercase text-gray-500 dark:text-gray-300 lg:text-base xl:text-xl">
-					{noNodes} Nodes
-				</div>
-				<div class="text-sm uppercase text-gray-400 dark:text-gray-400">
-					({$noActiveNodes$} active, {$noStandbyNodes$} standby)
-				</div>
-				<div class="py-2 text-center text-sm uppercase text-gray-400 dark:text-gray-200 lg:px-3">
-					to manage {$noTotalAsgards$} Asgards and {$noTotalYggs$} Yggdrasils
+					{noNodes} active nodes
 				</div>
 			{:else}
 				{@const poolStatus = getPoolStatus(asset, $pools$)}

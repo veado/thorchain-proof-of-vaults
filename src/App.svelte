@@ -12,7 +12,10 @@
 		vaultSort$$,
 		vaultSearch$$,
 		noRetiringAsgards$,
-		noActiveAsgards$
+		noActiveAsgards$,
+		noTotalAsgards$,
+		noTotalYggs$,
+		noTotalNodes$
 	} from './stores/store';
 
 	import * as RD from '@devexperts/remote-data-ts';
@@ -88,15 +91,35 @@
 <div class="flex w-full justify-end p-3"><ThemeSwitch /></div>
 <div class="flex flex-col items-center px-5 md:px-10 xl:px-20">
 	<!-- logo + title -->
-	<header class="container flex flex-col items-center bg-gray-50 pb-16 dark:bg-gray-700">
+	<header class="container mb-10 flex flex-col items-center bg-gray-50 dark:bg-gray-700 lg:mb-16">
 		<a href="https://thorchain.org/" class="">
 			<img
 				src={logo}
-				class="ease h-[60px] w-[60px] max-w-full rounded-full border-8 border-black hover:scale-110 hover:shadow-xl"
+				class="ease h-[50px] w-[50px] max-w-full rounded-full border-8 border-black hover:scale-110 hover:shadow-xl lg:h-[60px] lg:w-[60px]"
 				alt=""
 			/>
 		</a>
-		<h1 class="mt-2 text-2xl uppercase text-gray-900 dark:text-gray-50">Proof Of Vaults</h1>
+		<h1 class="mt-2 text-2xl uppercase text-gray-900 dark:text-gray-50 lg:text-4xl">
+			Proof Of Vaults
+		</h1>
+		<div class="mt-3 flex items-center lg:mt-6">
+			<div class="px-3 text-sm uppercase text-gray-400 dark:text-gray-200 lg:text-base xl:text-lg">
+				{$noTotalNodes$} active nodes
+			</div>
+			<div
+				class="border-l border-gray-300 px-3 text-sm uppercase text-gray-400 dark:text-gray-200 lg:text-base xl:text-lg"
+			>
+				{$noTotalAsgards$} Asgards
+			</div>
+			<!-- Yggs will be ZERO (deprecated) in the near future - don't show it then -->
+			{#if $noTotalYggs$ > 0}
+				<div
+					class="border-l border-gray-300 px-3 text-sm uppercase text-gray-400 dark:text-gray-200 lg:text-base xl:text-lg"
+				>
+					{$noTotalYggs$} Yggdrasils
+				</div>
+			{/if}
+		</div>
 	</header>
 
 	<div class="container flex flex-col bg-white shadow-md dark:bg-gray-900">

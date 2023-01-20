@@ -8,7 +8,13 @@ import type * as Eq from 'fp-ts/lib/Eq';
 import * as A from 'fp-ts/lib/Array';
 
 import type BigNumber from 'bignumber.js';
-import { assetAmount, baseAmount, type AssetAmount, type BaseAmount } from '@xchainjs/xchain-util';
+import {
+	assetAmount,
+	baseAmount,
+	type AssetAmount,
+	type BaseAmount,
+	type Chain
+} from '@xchainjs/xchain-util';
 import type { Monoid } from 'fp-ts/lib/Monoid';
 import type { VaultData, VaultListData } from 'src/types/types';
 
@@ -31,6 +37,8 @@ export const monoidAssetAmount = (decimal: number): Monoid<AssetAmount> => ({
 	},
 	empty: assetAmount(0, decimal)
 });
+
+export const eqChain: Eq.Eq<Chain> = S.Eq;
 
 export const eqOptionString = O.getEq(S.Eq);
 
@@ -91,5 +99,6 @@ const getOrdVaultDataValueByTypeStatus = ({ type, status }: VaultData): number =
 export const ordVaultDataByTypeStatus: Ord.Ord<VaultData> = Ord.fromCompare((x, y) =>
 	N.Ord.compare(getOrdVaultDataValueByTypeStatus(x), getOrdVaultDataValueByTypeStatus(y))
 );
+
 export const ordVaultDataByTypeStatusReverse: Ord.Ord<VaultData> =
 	Ord.reverse(ordVaultDataByTypeStatus);

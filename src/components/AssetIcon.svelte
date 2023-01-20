@@ -8,10 +8,10 @@
 	import IconTGT from '../assets/asset-tgt.png';
 	import IconDOGE from '../assets/asset-doge.png';
 	import IconATOM from '../assets/asset-atom.svg';
-	import IconUnknown from '../assets/asset-unknown.svg';
 
+	import { eqAsset, type Asset } from '@xchainjs/xchain-util';
 	import {
-		AssetAtom,
+		AssetATOM,
 		AssetAVAX,
 		AssetBCH,
 		AssetBNB,
@@ -21,18 +21,18 @@
 		AssetLTC,
 		AssetRuneB1A,
 		AssetRuneNative,
+		AssetTGTERC20,
+		AssetXRune,
 		AVAXChain,
 		BNBChain,
-		eqAsset,
-		eqChain,
-		ETHChain,
-		type Asset
-	} from '@xchainjs/xchain-util';
-	import { AssetTGTERC20, AssetXRune } from '../stores/const';
+		ETHChain
+	} from '../stores/const';
 
 	import * as FP from 'fp-ts/lib/function';
 	import { getEthTokenAddress } from '../utils/data';
 	import LoaderIcon from './LoaderIcon.svelte';
+	import UnkownAssetIcon from './UnkownAssetIcon.svelte';
+	import { eqChain } from '../utils/fp';
 
 	let className = '';
 	export { className as class };
@@ -86,7 +86,7 @@
 		}
 
 		// Atom
-		if (eqAsset(asset, AssetAtom)) {
+		if (eqAsset(asset, AssetATOM)) {
 			return IconATOM;
 		}
 
@@ -95,13 +95,13 @@
 			return 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/avalanchex/info/logo.png';
 		}
 
-		if (eqChain(asset.chain, BNBChain)) {
+		if (eqChain.equals(asset.chain, BNBChain)) {
 			return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/${asset.symbol}/logo.png`;
 		}
 
 		// Since we've already checked ETH.ETH before,
 		// we know any other asset is ERC20 here
-		if (eqChain(asset.chain, ETHChain)) {
+		if (eqChain.equals(asset.chain, ETHChain)) {
 			return FP.pipe(
 				getEthTokenAddress(asset),
 				(addr) =>
@@ -109,7 +109,7 @@
 			);
 		}
 
-		if (eqChain(asset.chain, AVAXChain)) {
+		if (eqChain.equals(asset.chain, AVAXChain)) {
 			return FP.pipe(
 				getEthTokenAddress(asset),
 				(addr) =>
@@ -118,12 +118,11 @@
 		}
 
 		hasError = true;
-		return IconUnknown;
+		return null;
 	};
 
-	const onImgError = (e: Event) => {
+	const onImgError = (_: Event) => {
 		hasError = true;
-		(e.target as HTMLImageElement).src = IconUnknown;
 	};
 
 	let loaded = false;
@@ -134,17 +133,19 @@
 </script>
 
 <div class="relative flex h-full w-full items-center justify-center {className}">
-	<LoaderIcon class="text-gray-400 {loaded || hasError ? 'hidden' : ''} h-10 w-10" />
-
-	<img
-		class="
-    absolute 
-    h-full w-full
-  rounded-full
-     {hasError ? 'opacity-10' : ''}"
-		src={imgSrc(asset)}
-		alt=""
-		on:error={onImgError}
-		on:load={onImgLoaded}
+	<LoaderIcon
+		class="text-gray-400 dark:text-gray-200 {loaded || hasError ? 'hidden' : ''} h-10 w-10"
 	/>
+
+	{#if hasError}
+		<UnkownAssetIcon class="absolute h-full w-full rounded-full text-gray-300 dark:text-gray-600" />
+	{:else}
+		<img
+			class="absolute h-full w-full rounded-full"
+			src={imgSrc(asset)}
+			alt=""
+			on:error={onImgError}
+			on:load={onImgLoaded}
+		/>
+	{/if}
 </div>
