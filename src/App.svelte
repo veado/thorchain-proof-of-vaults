@@ -102,10 +102,7 @@
 		<h1 class="mt-2 text-2xl uppercase text-gray-900 dark:text-gray-50 lg:text-4xl">
 			Proof Of Vaults
 		</h1>
-		<div class="mb-2 mt-3 text-xs uppercase text-gray-400 dark:text-gray-200 lg:mb-1 lg:mt-6">
-			Distributed by
-		</div>
-		<div class="flex items-center">
+		<div class="mt-3 flex items-center lg:mt-6">
 			<div class="px-3 text-sm uppercase text-gray-400 dark:text-gray-200 lg:text-base xl:text-lg">
 				{$noTotalNodes$} active nodes
 			</div>
